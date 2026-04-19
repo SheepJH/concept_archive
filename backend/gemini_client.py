@@ -11,7 +11,7 @@ from google.genai import types
 from prompts import RESPONSE_SCHEMA
 
 
-DEFAULT_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
+DEFAULT_MODEL = os.getenv("GEMINI_MODEL", "gemini-3-flash-preview")
 
 
 def _client() -> genai.Client:

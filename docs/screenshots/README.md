@@ -6,7 +6,7 @@
 - `hero.png` — 실제 생성된 카드뉴스 8장 중 대표 1~2장 (목업/몽타주)
 - `ios-shortcut.png` — iOS 단축어 구성 화면
 - `ig-post.png` — 실제 올라간 인스타 피드 스크린샷
-- `flow.png` (선택) — architecture.md의 ASCII 흐름을 이미지화한 것
+- `flow.png` (선택) — pipeline.md 흐름을 이미지화한 것
 
 README에서는 상대경로로 참조:
 ```markdown

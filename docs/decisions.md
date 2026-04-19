@@ -33,7 +33,7 @@ return {"ok": True, "queued": True}
 
 ---
 
-## 3. 왜 Gemini 2.5 Flash인가 — Claude / GPT-4 아닌
+## 3. 왜 Gemini 3 Flash인가 — Claude / GPT-4 아닌
 
 - **가격**: Flash는 입력 $0.075/M, 출력 $0.30/M. 카드 하나당 0.1센트 수준.
 - **structured output**: `response_schema`로 JSON 강제 가능. 실패율 낮음.

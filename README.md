@@ -10,36 +10,31 @@ iOS 단축어에 "양자역학"이라고 입력하고 실행하면,
 
 ---
 
-## TL;DR
-
-- **입력**: 개념 키워드 한 줄 (iOS 단축어)
-- **출력**: 인스타그램 피드에 8장 캐러셀 포스트
-- **소요**: 응답 즉시, 실제 발행까지 ~90초
-- **스택**: FastAPI + Gemini 2.5 Flash + Playwright + Cloud Run + GCS + IG Graph API
-
----
-
-## 아키텍처
+## 파이프라인
 
 ```mermaid
-flowchart LR
-    A["📱 iOS Shortcut"] -->|"POST /publish<br/>{concept: '...'}"| B["☁️ Cloud Run<br/>(FastAPI)"]
-    B -.->|"200 OK 즉시<br/>(fire-and-forget)"| A
-    B --> C["🧠 Gemini 2.5 Flash<br/>구조화 JSON"]
-    C --> D["🖼 Playwright<br/>HTML → PNG ×8"]
-    D --> E["📦 GCS<br/>공개 .png URL"]
-    E --> F["📸 Instagram<br/>Graph API"]
-    F -.->|"media_id / permalink"| A
+flowchart TD
+    A["📱 iOS Shortcut<br/><i>concept 한 줄</i>"]
+    B["☁️ Cloud Run · FastAPI<br/><i>fire-and-forget 디스패처</i>"]
+    C["🧠 Gemini 3 Flash<br/><i>구조화 JSON · 8장 생성</i>"]
+    D["🖼 Playwright<br/><i>HTML → PNG 1080×1350</i>"]
+    E["📦 Google Cloud Storage<br/><i>공개 .png URL · 7일 만료</i>"]
+    F["📸 Instagram Graph API<br/><i>캐러셀 발행 (3-step)</i>"]
 
-    classDef client fill:#0066FF,stroke:#0044cc,color:#fff
-    classDef server fill:#222,stroke:#666,color:#fff
+    A -->|"POST /publish"| B
+    B -.->|"200 OK 즉시"| A
+    B --> C --> D --> E --> F
+    F -.->|"media_id"| A
+
+    classDef client fill:#0066FF,stroke:#0044cc,color:#fff,stroke-width:2px
+    classDef server fill:#1a1a1a,stroke:#666,color:#fff
     class A client
     class B,C,D,E,F server
 ```
 
-**흐름 한 줄**: 개념 한 줄 → 즉시 200 응답 → 뒤에서 8장 생성·렌더·업로드·발행 → 약 90초 뒤 IG 피드에 캐러셀로 등장.
+**한 줄 요약** — 개념 한 줄 → 즉시 200 응답 → 뒤에서 8장 생성·렌더·업로드·발행 → 약 90초 뒤 IG 피드에 캐러셀로 등장.
 
-자세한 단계별 데이터 흐름은 **[docs/architecture.md](docs/architecture.md)** 참고.
+자세한 단계별 데이터 흐름은 **[docs/pipeline.md](docs/pipeline.md)** 참고.
 
 ---
 
@@ -49,7 +44,7 @@ flowchart LR
 |---|---|---|---|
 | 1 | **입력** | iOS Shortcut | 폰에서 키워드 한 줄만 치면 끝. 앱 개발 비용 0, UI 개발 비용 0. 개인 도구라 타겟 유저가 "나 하나". |
 | 2 | **서버** | Cloud Run + FastAPI | ▸ **Cloud Run**: Playwright + Chromium이 들어간 이미지는 Lambda(250MB) · GCF 용량 제한을 넘음. 컨테이너 그대로 올릴 수 있고 요청 없으면 0-스케일이라 비용도 거의 0.<br/>▸ **FastAPI**: `async` 네이티브 → `asyncio.create_task`로 fire-and-forget이 간결. Pydantic으로 요청 스키마 강제. |
-| 3 | **생성** | Gemini 2.5 Flash | ▸ **Flash**: 8장 카드 생성은 깊은 추론이 아니라 요약 + 포맷팅. 속도·단가 모두 최적 (카드 1장당 0.1센트).<br/>▸ **structured output (`response_schema`)**: 응답을 `{title, tags, cards[{id, main}]}` 스키마로 강제 → 파서·검증 코드 불필요. |
+| 3 | **생성** | Gemini 3 Flash | ▸ **Flash**: 8장 카드 생성은 깊은 추론이 아니라 요약 + 포맷팅. 속도·단가 모두 최적 (카드 1장당 0.1센트).<br/>▸ **structured output (`response_schema`)**: 응답을 `{title, tags, cards[{id, main}]}` 스키마로 강제 → 파서·검증 코드 불필요. |
 | 4 | **렌더** | Playwright (Chromium) | ▸ **Pillow로 한글 타이포 직접 계산은 불가능** (Pretendard 커닝, 자동 줄바꿈, flexbox 재현이 지옥).<br/>▸ 브라우저 렌더 엔진을 쓰면 **`index.html` 프리뷰 == 최종 PNG**가 1:1 보장됨. 디자인은 HTML/CSS만 만지면 됨. |
 | 5 | **저장** | Google Cloud Storage | ▸ **IG Graph API는 바이트 업로드 불가** — `image_url`만 받고, 리다이렉트 미추적, `.png`/`.jpg` 확장자만 허용.<br/>▸ 공개 버킷 + 확장자 포함 파일명 + Content-Type 명시 = IG가 받아줌.<br/>▸ 7일 lifecycle 자동 삭제 (원본은 IG에 박히므로 임시 저장소 역할). |
 | 6 | **발행** | Instagram Graph API | ▸ 유일한 공식 자동 업로드 경로 (Business 계정 전용).<br/>▸ 캐러셀은 3단계 상태 머신(컨테이너 N개 → 부모 컨테이너 → publish) — `status_code=FINISHED` 폴링까지 `instagram.py`에 격리. |
@@ -83,7 +78,7 @@ concept-archive/
 │   ├── requirements.txt
 │   └── .env.example
 ├── docs/
-│   ├── architecture.md     # 파이프라인 상세 흐름
+│   ├── pipeline.md         # 파이프라인 상세 흐름
 │   ├── decisions.md        # 설계 결정 기록
 │   ├── design.md           # 카드 디자인 시스템 명세
 │   └── screenshots/        # README/문서용 이미지
@@ -102,7 +97,7 @@ concept-archive/
 3. **`--no-cpu-throttling` 필수** — 응답 후 CPU 스로틀링되면 백그라운드 태스크가 죽음. Cloud Run 기본값에선 동작 안 함.
 4. **Playwright로 HTML→PNG** — Pillow로 한글 타이포 수동 계산은 지옥. 브라우저 렌더 == 최종 결과 1:1 보장.
 5. **GCS 경유 (IG 바이트 업로드 불가)** — IG Graph API는 `image_url`만 받고, 리다이렉트 안 따라가고, `.png`/`.jpg` 확장자만 허용.
-6. **Gemini 2.5 Flash + structured output** — 카드뉴스는 요약 작업. Flash로 충분. `response_schema`로 JSON 강제.
+6. **Gemini 3 Flash + structured output** — 카드뉴스는 요약 작업. Flash로 충분. `response_schema`로 JSON 강제.
 7. **concurrency=1 / max-instances=3** — Chromium 동시 기동은 OOM. 인스턴스당 1개만, 최대 3인스턴스.
 
 ---
