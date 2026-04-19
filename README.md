@@ -30,6 +30,22 @@ iOS 단축어에 "양자역학"이라고 입력하면, 약 90초 뒤
 
 ---
 
+## 기술 스택
+
+| 레이어 | 사용 기술 |
+|---|---|
+| **런타임** | Python 3.13 · Docker (`mcr.microsoft.com/playwright/python:v1.48.0-jammy`) |
+| **백엔드** | FastAPI 0.115 · Uvicorn 0.32 · Pydantic 2.9 · httpx 0.27 |
+| **LLM** | Google Gemini 3 Flash (`google-genai` SDK) · structured output |
+| **렌더링** | Playwright 1.48 (Chromium) · HTML5 · CSS3 |
+| **프론트 (프리뷰)** | Vanilla JS · Pretendard · Inter (CDN) |
+| **인프라** | Google Cloud Run · Cloud Storage · Secret Manager · Cloud Build |
+| **외부 API** | Instagram Graph API v21.0 (Business 계정) |
+| **클라이언트** | iOS Shortcuts |
+| **CI / 배포** | `gcloud run deploy --source .` (Cloud Build 자동) |
+
+---
+
 ## 템플릿 예시
 
 "더닝-크루거 효과"라는 개념으로 생성한 카드뉴스 중 일부. 전체 15종의 템플릿 규격은 **[docs/design.md](docs/design.md)** 참고.
