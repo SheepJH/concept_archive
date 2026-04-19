@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>15 · 2×2 매트릭스</title>
+<link rel="stylesheet" href="../shared/styles.css">
+<style>
+  .matrix .main { justify-content: center; gap: var(--space-4); }
+  .matrix .heading {
+    font-size: var(--fs-h2);
+    font-weight: 700;
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+    margin-bottom: var(--space-2);
+  }
+  .matrix .axes {
+    display: grid;
+    grid-template-columns: 72px 1fr 72px;
+    grid-template-rows: 32px 1fr 32px;
+    gap: var(--space-2);
+    align-items: center;
+  }
+  .matrix .y-hi,
+  .matrix .y-lo,
+  .matrix .x-lo,
+  .matrix .x-hi {
+    font-size: var(--fs-label);
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: var(--ink-muted);
+  }
+  .matrix .y-hi { grid-column: 2; grid-row: 1; text-align: center; color: var(--ink); }
+  .matrix .y-lo { grid-column: 2; grid-row: 3; text-align: center; }
+  .matrix .x-lo { grid-column: 1; grid-row: 2; text-align: right; }
+  .matrix .x-hi { grid-column: 3; grid-row: 2; text-align: left; color: var(--ink); }
+  .matrix .grid {
+    grid-column: 2; grid-row: 2;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: var(--space-2);
+  }
+  .matrix .quadrant {
+    padding: var(--space-4);
+    border: 1.5px solid var(--line);
+    border-radius: var(--radius-md);
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    min-height: 280px;
+  }
+  .matrix .quadrant.highlight {
+    background: var(--accent-soft);
+    border-color: var(--accent);
+  }
+  .matrix .q-title {
+    font-size: 30px;
+    font-weight: 800;
+    line-height: 1.25;
+    color: var(--ink);
+  }
+  .matrix .quadrant.highlight .q-title { color: var(--accent); }
+  .matrix .q-desc {
+    font-size: 22px;
+    font-weight: 400;
+    line-height: 1.4;
+    color: var(--ink-soft);
+  }
+  .matrix .caption-note {
+    margin-top: var(--space-3);
+    font-size: var(--fs-caption);
+    color: var(--ink-muted);
+    line-height: 1.4;
+  }
+</style>
+</head>
+<body data-page="04" data-total="08">
+  <div class="card matrix">
+    <div class="meta-top">
+      <span class="label">매트릭스</span>
+      <span class="num page-display"></span>
+    </div>
+    <div class="main">
+      <h2 class="heading">두 축으로 보는<br><span class="accent">네 가지 유형</span></h2>
+      <div class="axes">
+        <span class="y-hi">↑ 중요</span>
+        <span class="x-lo">← 비긴급</span>
+        <div class="grid">
+          <div class="quadrant q1">
+            <div class="q-title">중요 · 비긴급</div>
+            <div class="q-desc">계획해서 투자. 성장의 영역.</div>
+          </div>
+          <div class="quadrant q2 highlight">
+            <div class="q-title">중요 · 긴급</div>
+            <div class="q-desc">지금 즉시 처리. 미루면 더 커진다.</div>
+          </div>
+          <div class="quadrant q3">
+            <div class="q-title">덜 중요 · 비긴급</div>
+            <div class="q-desc">과감히 버린다. 시간 낭비 구간.</div>
+          </div>
+          <div class="quadrant q4">
+            <div class="q-title">덜 중요 · 긴급</div>
+            <div class="q-desc">위임하거나 빠르게 끝낸다.</div>
+          </div>
+        </div>
+        <span class="x-hi">긴급 →</span>
+        <span class="y-lo">↓ 덜 중요</span>
+      </div>
+      <p class="caption-note">※ 두 축으로 유형을 가를 때, <b>강조 사분면</b>이 먼저 행동할 영역이다.</p>
+    </div>
+    <div class="meta-bottom">
+      <span class="brand">@what_is_this.zip</span>
+      <span>#생산성</span>
+    </div>
+  </div>
+  <script src="../shared/page-number.js"></script>
+</body>
+</html>

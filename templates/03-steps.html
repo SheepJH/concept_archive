@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>04 · 단계</title>
+<link rel="stylesheet" href="../shared/styles.css">
+<style>
+  .steps .main { justify-content: center; gap: var(--space-6); }
+  .steps .heading {
+    font-size: var(--fs-h2);
+    font-weight: 700;
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+    margin-bottom: var(--space-4);
+  }
+  .steps .heading .em { color: var(--accent); }
+  .steps .list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+  .steps .item {
+    display: grid;
+    grid-template-columns: 110px 1fr;
+    gap: var(--space-4);
+    align-items: center;
+    padding: var(--space-4) var(--space-6);
+    border-left: 4px solid var(--line);
+    transition: none;
+  }
+  .steps .item.active {
+    border-left-color: var(--accent);
+    background: var(--accent-soft);
+  }
+  .steps .num-big {
+    font-family: var(--font-num);
+    font-size: 72px;
+    font-weight: 800;
+    line-height: 1;
+    color: var(--ink-muted);
+    letter-spacing: -0.03em;
+  }
+  .steps .item.active .num-big { color: var(--accent); }
+  .steps .item-title {
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--ink);
+    line-height: 1.3;
+  }
+  .steps .item-desc {
+    font-size: 26px;
+    font-weight: 400;
+    color: var(--ink-soft);
+    line-height: 1.4;
+    margin-top: 6px;
+  }
+</style>
+</head>
+<body data-page="02" data-total="06">
+  <div class="card steps">
+    <div class="meta-top">
+      <span class="label">단계</span>
+      <span class="num page-display"></span>
+    </div>
+    <div class="main">
+      <h2 class="heading">자신감은 이 <span class="em">4단계</span>를<br>따라 움직인다</h2>
+      <div class="list">
+        <div class="item active">
+          <div class="num-big">01</div>
+          <div>
+            <div class="item-title">무지의 봉우리</div>
+            <div class="item-desc">조금 배우고 "이 정도면 다 안다" 자신감 폭발</div>
+          </div>
+        </div>
+        <div class="item">
+          <div class="num-big">02</div>
+          <div>
+            <div class="item-title">절망의 계곡</div>
+            <div class="item-desc">알수록 모르는 게 많아, 급격히 무너지는 구간</div>
+          </div>
+        </div>
+        <div class="item">
+          <div class="num-big">03</div>
+          <div>
+            <div class="item-title">깨달음의 비탈</div>
+            <div class="item-desc">조금씩 재구성하며 실력이 진짜로 오른다</div>
+          </div>
+        </div>
+        <div class="item">
+          <div class="num-big">04</div>
+          <div>
+            <div class="item-title">지속의 고원</div>
+            <div class="item-desc">현실적 자신감. 진짜 전문가의 평온한 단계</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="meta-bottom">
+      <span class="brand">@what_is_this.zip</span>
+      <span>#심리학</span>
+    </div>
+  </div>
+  <script src="../shared/page-number.js"></script>
+</body>
+</html>

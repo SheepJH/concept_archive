@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>12 · 체크리스트</title>
+<link rel="stylesheet" href="../shared/styles.css">
+<style>
+  .check .main { justify-content: center; gap: var(--space-6); }
+  .check .heading {
+    font-size: var(--fs-h2);
+    font-weight: 700;
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+  }
+  .check .sub {
+    font-size: var(--fs-caption);
+    color: var(--ink-muted);
+    margin-top: 10px;
+  }
+  .check .list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    margin-top: var(--space-3);
+  }
+  .check .item {
+    display: grid;
+    grid-template-columns: 56px 1fr;
+    align-items: start;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-4);
+    border-bottom: 1px solid var(--line);
+  }
+  .check .item:last-child { border-bottom: none; }
+  .check .box {
+    width: 40px; height: 40px;
+    border: 3px solid var(--ink);
+    border-radius: 8px;
+    margin-top: 4px;
+  }
+  .check .item.done .box {
+    background: var(--accent);
+    border-color: var(--accent);
+    position: relative;
+  }
+  .check .item.done .box::after {
+    content: "✓";
+    color: #fff;
+    font-weight: 800;
+    font-size: 30px;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -55%);
+  }
+  .check .item .text {
+    font-size: 28px;
+    line-height: 1.4;
+    color: var(--ink);
+    font-weight: 500;
+  }
+  .check .item.done .text {
+    color: var(--ink-muted);
+    text-decoration: line-through;
+    text-decoration-thickness: 2px;
+  }
+  .check .scoring {
+    margin-top: var(--space-4);
+    padding: var(--space-3) var(--space-4);
+    background: var(--accent-soft);
+    color: var(--accent);
+    border-radius: var(--radius-md);
+    font-size: 24px;
+    line-height: 1.5;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body data-page="02" data-total="06">
+  <div class="card check">
+    <div class="meta-top">
+      <span class="label">체크리스트</span>
+      <span class="num page-display"></span>
+    </div>
+    <div class="main">
+      <div>
+        <h2 class="heading">나는 지금 얼마나<br><span class="accent">겸손</span>한가?</h2>
+        <p class="sub">최근 1개월 기준으로 체크해보세요.</p>
+      </div>
+      <div class="list">
+        <div class="item">
+          <div class="box"></div>
+          <div class="text">이 분야에서 실패한 경험이 있다</div>
+        </div>
+        <div class="item">
+          <div class="box"></div>
+          <div class="text">반대 의견을 끝까지 들어본 적이 있다</div>
+        </div>
+        <div class="item">
+          <div class="box"></div>
+          <div class="text">"잘 모르겠다"고 입 밖으로 말한 적이 있다</div>
+        </div>
+        <div class="item">
+          <div class="box"></div>
+          <div class="text">내 주장의 출처를 3개 이상 댈 수 있다</div>
+        </div>
+        <div class="item">
+          <div class="box"></div>
+          <div class="text">전문가에게 내 생각을 검증받았다</div>
+        </div>
+      </div>
+      <div class="scoring">3개 이하라면, 지금은 <b>봉우리 근처</b>일 가능성이 높아요.</div>
+    </div>
+    <div class="meta-bottom">
+      <span class="brand">@what_is_this.zip</span>
+      <span>#심리학</span>
+    </div>
+  </div>
+  <script src="../shared/page-number.js"></script>
+</body>
+</html>

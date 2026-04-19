@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>06 · 비교</title>
+<link rel="stylesheet" href="../shared/styles.css">
+<style>
+  .cmp .main { justify-content: center; gap: var(--space-6); }
+  .cmp .heading {
+    font-size: var(--fs-h2);
+    font-weight: 700;
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+  }
+  .cmp .table {
+    display: grid;
+    grid-template-columns: 220px 1fr 1fr;
+    border-top: 2px solid var(--ink);
+    border-bottom: 2px solid var(--ink);
+  }
+  .cmp .cell {
+    padding: 22px var(--space-3);
+    border-bottom: 1px solid var(--line);
+    font-size: 28px;
+    line-height: 1.4;
+  }
+  .cmp .row:last-child .cell { border-bottom: none; }
+  .cmp .head .cell {
+    font-size: 30px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    padding-top: var(--space-3);
+    padding-bottom: var(--space-3);
+    border-bottom: 2px solid var(--ink);
+  }
+  .cmp .head .col-a { color: var(--ink-muted); }
+  .cmp .head .col-b { color: var(--accent); }
+  .cmp .row { display: contents; }
+  .cmp .criterion {
+    font-size: var(--fs-label);
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    align-self: center;
+  }
+  .cmp .col-a { color: var(--ink-soft); }
+  .cmp .col-b { color: var(--ink); font-weight: 600; }
+  .cmp .caption-note {
+    margin-top: var(--space-4);
+    font-size: var(--fs-caption);
+    color: var(--ink-muted);
+    line-height: 1.4;
+  }
+</style>
+</head>
+<body data-page="02" data-total="06">
+  <div class="card cmp">
+    <div class="meta-top">
+      <span class="label">비교</span>
+      <span class="num page-display"></span>
+    </div>
+    <div class="main">
+      <h2 class="heading">초보자 vs <span class="accent">전문가</span><br>생각하는 방식의 차이</h2>
+      <div class="table">
+        <div class="row head">
+          <div class="cell"></div>
+          <div class="cell col-a">초보자</div>
+          <div class="cell col-b">전문가</div>
+        </div>
+        <div class="row">
+          <div class="cell criterion">자신감</div>
+          <div class="cell col-a">과하게 높음</div>
+          <div class="cell col-b">낮고 조심스러움</div>
+        </div>
+        <div class="row">
+          <div class="cell criterion">답변 스타일</div>
+          <div class="cell col-a">"이게 정답이에요"</div>
+          <div class="cell col-b">"상황에 따라 달라요"</div>
+        </div>
+        <div class="row">
+          <div class="cell criterion">시야</div>
+          <div class="cell col-a">좁고 단순</div>
+          <div class="cell col-b">넓고 맥락 고려</div>
+        </div>
+        <div class="row">
+          <div class="cell criterion">피드백 반응</div>
+          <div class="cell col-a">방어적 · 반박</div>
+          <div class="cell col-b">흡수 · 재검토</div>
+        </div>
+      </div>
+      <p class="caption-note">※ 실력 차이보다 <b>자기 인식의 해상도</b>가 본질적 차이.</p>
+    </div>
+    <div class="meta-bottom">
+      <span class="brand">@what_is_this.zip</span>
+      <span>#심리학</span>
+    </div>
+  </div>
+  <script src="../shared/page-number.js"></script>
+</body>
+</html>

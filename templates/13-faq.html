@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>13 · FAQ</title>
+<link rel="stylesheet" href="../shared/styles.css">
+<style>
+  .faq .main { justify-content: center; gap: var(--space-4); }
+  .faq .heading {
+    font-size: var(--fs-h2);
+    font-weight: 700;
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+    margin-bottom: var(--space-2);
+  }
+  .faq .list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+  .faq .qa {
+    padding: var(--space-4) var(--space-6);
+    background: var(--surface);
+    border-radius: var(--radius-md);
+    border-left: 6px solid var(--accent);
+  }
+  .faq .q {
+    display: grid;
+    grid-template-columns: 48px 1fr;
+    gap: var(--space-2);
+    align-items: start;
+    margin-bottom: 12px;
+  }
+  .faq .q .tag {
+    font-family: var(--font-num);
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--accent);
+    line-height: 1.2;
+  }
+  .faq .q .q-text {
+    font-size: 30px;
+    font-weight: 700;
+    line-height: 1.35;
+    color: var(--ink);
+  }
+  .faq .a {
+    display: grid;
+    grid-template-columns: 48px 1fr;
+    gap: var(--space-2);
+    align-items: start;
+  }
+  .faq .a .tag {
+    font-family: var(--font-num);
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--ink-muted);
+    line-height: 1.2;
+  }
+  .faq .a .a-text {
+    font-size: 26px;
+    line-height: 1.45;
+    color: var(--ink-soft);
+  }
+  .faq .a .a-text b { color: var(--ink); }
+</style>
+</head>
+<body data-page="02" data-total="06">
+  <div class="card faq">
+    <div class="meta-top">
+      <span class="label">FAQ</span>
+      <span class="num page-display"></span>
+    </div>
+    <div class="main">
+      <h2 class="heading">자주 묻는 질문</h2>
+      <div class="list">
+        <div class="qa">
+          <div class="q"><span class="tag">Q.</span><span class="q-text">저도 이 효과에 걸릴 수 있나요?</span></div>
+          <div class="a"><span class="tag">A.</span><span class="a-text">네, <b>누구나, 어떤 분야에서든</b> 걸립니다. 스스로 "난 예외"라 느낀다면 오히려 빠져 있을 가능성이 높아요.</span></div>
+        </div>
+        <div class="qa">
+          <div class="q"><span class="tag">Q.</span><span class="q-text">어떻게 벗어날 수 있나요?</span></div>
+          <div class="a"><span class="tag">A.</span><span class="a-text">세 가지 습관: ①<b>외부 피드백</b>을 정기적으로 받기, ②<b>반대 의견</b>을 진지하게 검토, ③ 결과를 <b>수치로</b> 측정해보기.</span></div>
+        </div>
+        <div class="qa">
+          <div class="q"><span class="tag">Q.</span><span class="q-text">전문가는 이 효과에서 자유롭나요?</span></div>
+          <div class="a"><span class="tag">A.</span><span class="a-text">본인 분야에선 안전하지만, <b>다른 분야</b>로 넘어가면 똑같이 초보가 됩니다. 그래서 "영역을 벗어나 말할 때" 가장 위험해요.</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="meta-bottom">
+      <span class="brand">@what_is_this.zip</span>
+      <span>#심리학</span>
+    </div>
+  </div>
+  <script src="../shared/page-number.js"></script>
+</body>
+</html>

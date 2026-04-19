@@ -1,0 +1,41 @@
+# Secrets / credentials
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+service-account*.json
+gcp-key*.json
+secrets/
+backend/secrets/
+
+# Python
+.venv/
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+.pytest_cache/
+
+# Node / browser
+node_modules/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+
+# Claude Code local settings
+.claude/
+
+# Build / Docker
+*.log
+.dockerignore.local
+
+# Local artifacts
+*.local
+out/
+dist/

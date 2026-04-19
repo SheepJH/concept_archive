@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>08 · 스펙트럼</title>
+<link rel="stylesheet" href="../shared/styles.css">
+<style>
+  .spec .main { justify-content: center; gap: var(--space-8); }
+  .spec .heading {
+    font-size: var(--fs-h2);
+    font-weight: 700;
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+  }
+  .spec .spectrum-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    margin-top: var(--space-4);
+  }
+  .spec .bar {
+    position: relative;
+    height: 24px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--accent-soft) 0%, var(--line) 50%, var(--ink) 100%);
+  }
+  .spec .marker {
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 48px; height: 48px;
+    border-radius: 50%;
+    background: #fff;
+    border: 6px solid var(--accent);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+  }
+  .spec .marker-label {
+    position: absolute;
+    top: -70px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--accent);
+    color: #fff;
+    padding: 10px 18px;
+    border-radius: var(--radius-sm);
+    font-size: 22px;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+  .spec .marker-label::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: -8px;
+    transform: translateX(-50%);
+    width: 0; height: 0;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-top: 10px solid var(--accent);
+  }
+  .spec .ends {
+    display: flex;
+    justify-content: space-between;
+    padding: 0 8px;
+  }
+  .spec .ends .end {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    max-width: 340px;
+  }
+  .spec .ends .end.right { text-align: right; }
+  .spec .ends .end .pole {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .spec .ends .end .sub {
+    font-size: 22px;
+    color: var(--ink-muted);
+    line-height: 1.4;
+  }
+  .spec .insight {
+    margin-top: var(--space-6);
+    padding: var(--space-4) var(--space-6);
+    background: var(--surface);
+    border-radius: var(--radius-md);
+    font-size: 26px;
+    line-height: 1.5;
+    color: var(--ink);
+  }
+  .spec .insight b { color: var(--accent); }
+</style>
+</head>
+<body data-page="02" data-total="06">
+  <div class="card spec">
+    <div class="meta-top">
+      <span class="label">스펙트럼</span>
+      <span class="num page-display"></span>
+    </div>
+    <div class="main">
+      <h2 class="heading">자기 인식은<br><span class="accent">연속선</span> 위에 있다</h2>
+      <div class="spectrum-wrap">
+        <div class="bar">
+          <div class="marker" style="left: 22%;">
+            <div class="marker-label">지금 당신</div>
+          </div>
+        </div>
+        <div class="ends">
+          <div class="end left">
+            <span class="pole">"난 다 안다"</span>
+            <span class="sub">무지의 봉우리<br>(더닝–크루거 구간)</span>
+          </div>
+          <div class="end right">
+            <span class="pole">"난 아직도 모른다"</span>
+            <span class="sub">현실적 자기 인식<br>(숙련자 구간)</span>
+          </div>
+        </div>
+      </div>
+      <div class="insight">
+        이 축은 <b>이분법이 아니라 연속</b>이다. 분야마다 내가 놓인 위치가 다르며, 같은 사람도 주제가 바뀌면 좌우로 이동한다.
+      </div>
+    </div>
+    <div class="meta-bottom">
+      <span class="brand">@what_is_this.zip</span>
+      <span>#심리학</span>
+    </div>
+  </div>
+  <script src="../shared/page-number.js"></script>
+</body>
+</html>

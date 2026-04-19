@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>17 · 인과사슬</title>
+<link rel="stylesheet" href="../shared/styles.css">
+<style>
+  .chain .main { justify-content: center; gap: var(--space-3); }
+  .chain .heading {
+    font-size: var(--fs-h2);
+    font-weight: 700;
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+    margin-bottom: var(--space-2);
+  }
+  .chain .heading .accent { color: var(--accent); }
+  .chain .chain {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+  }
+  .chain .link {
+    display: grid;
+    grid-template-columns: 72px 1fr;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-4);
+    background: var(--surface);
+    border-radius: var(--radius-md);
+    border-left: 4px solid var(--line);
+  }
+  .chain .link.outcome {
+    background: var(--accent-soft);
+    border-left-color: var(--accent);
+  }
+  .chain .link .n {
+    width: 56px; height: 56px;
+    border-radius: 50%;
+    background: #fff;
+    border: 2.5px solid var(--ink-muted);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-num);
+    font-size: 26px;
+    font-weight: 800;
+    color: var(--ink);
+    letter-spacing: -0.02em;
+  }
+  .chain .link.outcome .n {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+  .chain .link .body {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .chain .link .t {
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1.3;
+    color: var(--ink);
+  }
+  .chain .link.outcome .t { color: var(--accent); }
+  .chain .link .d {
+    font-size: 22px;
+    font-weight: 400;
+    line-height: 1.4;
+    color: var(--ink-soft);
+  }
+  .chain .arrow {
+    align-self: center;
+    font-size: 28px;
+    font-weight: 600;
+    color: var(--ink-muted);
+    line-height: 1;
+    padding: 6px 0;
+    font-family: var(--font-num);
+  }
+  .chain .note {
+    margin-top: var(--space-3);
+    font-size: var(--fs-caption);
+    color: var(--ink-muted);
+    line-height: 1.4;
+  }
+  .chain .note b { color: var(--ink); }
+</style>
+</head>
+<body data-page="03" data-total="08">
+  <div class="card chain">
+    <div class="meta-top">
+      <span class="label">인과</span>
+      <span class="num page-display"></span>
+    </div>
+    <div class="main">
+      <h2 class="heading">원인은 어떻게<br><span class="accent">결과로 번지나</span></h2>
+      <div class="chain">
+        <div class="link">
+          <span class="n">1</span>
+          <div class="body">
+            <span class="t">얕게 배운다</span>
+            <span class="d">입문 지식만 습득하고 경계선을 보지 못한다.</span>
+          </div>
+        </div>
+        <div class="arrow">↓ 때문에</div>
+        <div class="link">
+          <span class="n">2</span>
+          <div class="body">
+            <span class="t">모르는 것을 인지하지 못한다</span>
+            <span class="d">미지의 영역이 있다는 사실조차 가려진다.</span>
+          </div>
+        </div>
+        <div class="arrow">↓ 그래서</div>
+        <div class="link">
+          <span class="n">3</span>
+          <div class="body">
+            <span class="t">자신감이 과대 계산된다</span>
+            <span class="d">작은 분모 위에서 비율이 부풀어 오른다.</span>
+          </div>
+        </div>
+        <div class="arrow">↓ 결국</div>
+        <div class="link outcome">
+          <span class="n">4</span>
+          <div class="body">
+            <span class="t">봉우리 구간에 멈춘다</span>
+            <span class="d">더 배울 동기가 사라지고 같은 지점에 고인다.</span>
+          </div>
+        </div>
+      </div>
+      <p class="note">각 화살표는 <b>인과</b>다. 단순한 순서가 아니라, 앞이 뒤를 만든다.</p>
+    </div>
+    <div class="meta-bottom">
+      <span class="brand">@what_is_this.zip</span>
+      <span>#심리학</span>
+    </div>
+  </div>
+  <script src="../shared/page-number.js"></script>
+</body>
+</html>

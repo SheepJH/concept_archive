@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>09 · 실생활 사례</title>
+<link rel="stylesheet" href="../shared/styles.css">
+<style>
+  .real .main { justify-content: center; gap: var(--space-6); }
+  .real .heading {
+    font-size: var(--fs-h2);
+    font-weight: 700;
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+  }
+  .real .cases {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+  .real .case {
+    display: grid;
+    grid-template-columns: 120px 1fr;
+    gap: var(--space-4);
+    padding: var(--space-4) var(--space-6);
+    background: var(--surface);
+    border-radius: var(--radius-md);
+    align-items: center;
+  }
+  .real .ico {
+    width: 96px; height: 96px;
+    border-radius: 50%;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 48px;
+  }
+  .real .case-scene {
+    font-size: var(--fs-label);
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .real .case-body {
+    font-size: 28px;
+    line-height: 1.4;
+    color: var(--ink);
+  }
+  .real .case-body b { color: var(--ink); }
+  .real .case-body .quote {
+    display: inline;
+    background: var(--accent-soft);
+    padding: 2px 8px;
+    border-radius: 6px;
+    color: var(--accent);
+    font-weight: 600;
+  }
+</style>
+</head>
+<body data-page="02" data-total="06">
+  <div class="card real">
+    <div class="meta-top">
+      <span class="label">실생활 사례</span>
+      <span class="num page-display"></span>
+    </div>
+    <div class="main">
+      <h2 class="heading">일상에서 이런 모습으로<br>나타난다</h2>
+      <div class="cases">
+        <div class="case">
+          <div class="ico">🚗</div>
+          <div>
+            <div class="case-scene">운전</div>
+            <div class="case-body">면허 딴 지 3개월. <span class="quote">"나 운전 꽤 잘 해"</span> — 5년차가 되면 오히려 <b>브레이크부터 밟게 된다.</b></div>
+          </div>
+        </div>
+        <div class="case">
+          <div class="ico">💼</div>
+          <div>
+            <div class="case-scene">새 직장</div>
+            <div class="case-body">입사 2주차에 <span class="quote">"별거 없네"</span>. 6개월 지나면 <b>"진짜 모르는 게 많다"</b>는 깨달음이 온다.</div>
+          </div>
+        </div>
+        <div class="case">
+          <div class="ico">💬</div>
+          <div>
+            <div class="case-scene">SNS 댓글</div>
+            <div class="case-body">헤드라인만 보고 <span class="quote">"이건 이래서 틀렸다"</span>. 실제 논문을 읽은 사람은 <b>조심스럽게 "맥락이 있다"</b>고 말한다.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="meta-bottom">
+      <span class="brand">@what_is_this.zip</span>
+      <span>#심리학</span>
+    </div>
+  </div>
+  <script src="../shared/page-number.js"></script>
+</body>
+</html>

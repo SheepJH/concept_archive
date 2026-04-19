@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>01 · 개요</title>
+<link rel="stylesheet" href="../shared/styles.css">
+<style>
+  /* Template-specific */
+  .overview .main {
+    justify-content: space-between;
+    padding-top: var(--space-8);
+  }
+  .overview .title-block {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+  }
+  .overview .category {
+    font-size: var(--fs-label);
+    font-weight: 600;
+    color: var(--accent);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+  .overview .title {
+    font-size: var(--fs-display);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.025em;
+    color: var(--ink);
+  }
+  .overview .title .em {
+    background: linear-gradient(transparent 65%, var(--accent-soft) 65%);
+    padding: 0 6px;
+  }
+  .overview .tagline {
+    font-size: var(--fs-body-l);
+    font-weight: 500;
+    line-height: 1.4;
+    color: var(--ink-soft);
+    max-width: 820px;
+  }
+  .overview .footer-hint {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--fs-caption);
+    color: var(--ink-muted);
+  }
+  .overview .footer-hint .arrow {
+    font-size: 32px;
+    color: var(--accent);
+    animation: none;
+  }
+</style>
+</head>
+<body data-page="01" data-total="06">
+  <div class="card overview">
+
+    <div class="meta-top">
+      <span class="label">개요</span>
+      <span class="num page-display"></span>
+    </div>
+
+    <div class="main">
+      <div class="title-block">
+        <span class="category">Cognitive Bias</span>
+        <h1 class="title">더닝–크루거<br><span class="em">효과</span></h1>
+        <p class="tagline">무지할수록 자신감이 넘치는 이유,<br>그리고 진짜 전문가가 겸손한 이유.</p>
+      </div>
+
+      <div class="footer-hint">
+        <span>밀어서 보기</span>
+        <span class="arrow">→</span>
+      </div>
+    </div>
+
+    <div class="meta-bottom">
+      <span class="brand">@what_is_this.zip</span>
+      <span>#심리학</span>
+    </div>
+
+  </div>
+  <script src="../shared/page-number.js"></script>
+</body>
+</html>

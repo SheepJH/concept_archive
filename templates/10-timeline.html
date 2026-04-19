@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>05 · 타임라인</title>
+<link rel="stylesheet" href="../shared/styles.css">
+<style>
+  .timeline .main { justify-content: center; gap: var(--space-6); }
+  .timeline .heading {
+    font-size: var(--fs-h2);
+    font-weight: 700;
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+  }
+  .timeline .track {
+    position: relative;
+    padding-left: 60px;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+  }
+  .timeline .track::before {
+    content: "";
+    position: absolute;
+    left: 14px; top: 10px; bottom: 10px;
+    width: 3px;
+    background: var(--line);
+  }
+  .timeline .event {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .timeline .event::before {
+    content: "";
+    position: absolute;
+    left: -60px; top: 8px;
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: #fff;
+    border: 4px solid var(--ink);
+  }
+  .timeline .event.accent::before {
+    background: var(--accent);
+    border-color: var(--accent);
+    box-shadow: 0 0 0 8px var(--accent-soft);
+  }
+  .timeline .year {
+    font-family: var(--font-num);
+    font-size: 36px;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+  }
+  .timeline .event.accent .year { color: var(--accent); }
+  .timeline .event-title {
+    font-size: 30px;
+    font-weight: 600;
+    line-height: 1.3;
+    color: var(--ink);
+  }
+  .timeline .event-desc {
+    font-size: 24px;
+    color: var(--ink-muted);
+    line-height: 1.4;
+  }
+</style>
+</head>
+<body data-page="02" data-total="06">
+  <div class="card timeline">
+    <div class="meta-top">
+      <span class="label">타임라인</span>
+      <span class="num page-display"></span>
+    </div>
+    <div class="main">
+      <h2 class="heading">이 개념은 어떻게<br>발견되었나</h2>
+      <div class="track">
+        <div class="event">
+          <span class="year">1995</span>
+          <span class="event-title">레몬즙 강도 사건</span>
+          <span class="event-desc">펜실베이니아에서 한 남자가 얼굴에 레몬즙을 바르고 은행을 털었다. "CCTV에 안 찍힐 줄 알았다."</span>
+        </div>
+        <div class="event accent">
+          <span class="year">1999</span>
+          <span class="event-title">Dunning &amp; Kruger 논문 발표</span>
+          <span class="event-desc">Cornell 대학. 하위 25% 학생이 스스로를 상위 40%로 평가함을 실험 증명.</span>
+        </div>
+        <div class="event">
+          <span class="year">2000s</span>
+          <span class="event-title">대중문화로 확산</span>
+          <span class="event-desc">"모르는 사람이 더 당당하다"는 말로 번역되며 경영·정치 담론에 등장.</span>
+        </div>
+        <div class="event">
+          <span class="year">2020s</span>
+          <span class="event-title">밈으로 재해석</span>
+          <span class="event-desc">"봉우리-계곡" 그래프가 SNS 밈이 되며 자기 성찰 도구로 사용.</span>
+        </div>
+      </div>
+    </div>
+    <div class="meta-bottom">
+      <span class="brand">@what_is_this.zip</span>
+      <span>#심리학</span>
+    </div>
+  </div>
+  <script src="../shared/page-number.js"></script>
+</body>
+</html>
