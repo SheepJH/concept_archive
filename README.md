@@ -7,6 +7,19 @@ iOS 단축어에 "양자역학"이라고 입력하면, 약 90초 뒤
 
 ---
 
+## 템플릿 예시
+
+"더닝-크루거 효과"라는 개념으로 생성한 카드뉴스 중 일부. 전체 15종의 템플릿 규격은 **[docs/design.md](docs/design.md)** 참고.
+
+| | | |
+|:-:|:-:|:-:|
+| ![](docs/screenshots/template-01-overview.png) | ![](docs/screenshots/template-03-steps.png) | ![](docs/screenshots/template-07-comparison.png) |
+| **01 · 개요** (표지) | **03 · 단계** | **07 · 비교** |
+| ![](docs/screenshots/template-10-timeline.png) | ![](docs/screenshots/template-15-oneline.png) | |
+| **10 · 타임라인** | **15 · 한줄요약** (마지막) | |
+
+---
+
 ## 파이프라인
 
 ```mermaid
@@ -69,19 +82,6 @@ flowchart LR
 | **외부 API** | Instagram Graph API v21.0 (Business 계정) |
 | **클라이언트** | iOS Shortcuts |
 | **CI / 배포** | `gcloud run deploy --source .` (Cloud Build 자동) |
-
----
-
-## 템플릿 예시
-
-"더닝-크루거 효과"라는 개념으로 생성한 카드뉴스 중 일부. 전체 15종의 템플릿 규격은 **[docs/design.md](docs/design.md)** 참고.
-
-| | | |
-|:-:|:-:|:-:|
-| ![](docs/screenshots/template-01-overview.png) | ![](docs/screenshots/template-03-steps.png) | ![](docs/screenshots/template-07-comparison.png) |
-| **01 · 개요** (표지) | **03 · 단계** | **07 · 비교** |
-| ![](docs/screenshots/template-10-timeline.png) | ![](docs/screenshots/template-15-oneline.png) | |
-| **10 · 타임라인** | **15 · 한줄요약** (마지막) | |
 
 ---
 
