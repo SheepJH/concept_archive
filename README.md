@@ -21,67 +21,75 @@ iOS 단축어에 "양자역학"이라고 입력하고 실행하면,
 
 ## 아키텍처
 
-```
- ┌──────────────┐  POST /publish           ┌──────────────────────┐
- │ iOS Shortcut │ ───────────────────────▶ │  Cloud Run (FastAPI) │
- └──────────────┘  {concept: "..."}        │  200 OK 즉시 반환     │
-        ▲                                   │  (fire-and-forget)   │
-        │                                   └──────────┬───────────┘
-        │ ✅ 발행 완료 알림                             │
-        │                                              ▼
-        │                        ┌──────────┐    ┌────────────┐    ┌──────┐    ┌─────────┐
-        └──────────────────────  │ Gemini   │ ─▶ │ Playwright │ ─▶ │ GCS  │ ─▶ │ IG API  │
-           media_id              │ (JSON)   │    │ HTML→PNG   │    │ .png │    │ carousel│
-                                 └──────────┘    └────────────┘    └──────┘    └─────────┘
+```mermaid
+flowchart LR
+    A["📱 iOS Shortcut"] -->|"POST /publish<br/>{concept: '...'}"| B["☁️ Cloud Run<br/>(FastAPI)"]
+    B -.->|"200 OK 즉시<br/>(fire-and-forget)"| A
+    B --> C["🧠 Gemini 2.5 Flash<br/>구조화 JSON"]
+    C --> D["🖼 Playwright<br/>HTML → PNG ×8"]
+    D --> E["📦 GCS<br/>공개 .png URL"]
+    E --> F["📸 Instagram<br/>Graph API"]
+    F -.->|"media_id / permalink"| A
+
+    classDef client fill:#0066FF,stroke:#0044cc,color:#fff
+    classDef server fill:#222,stroke:#666,color:#fff
+    class A client
+    class B,C,D,E,F server
 ```
 
-자세한 흐름과 각 단계의 역할은 **[docs/architecture.md](docs/architecture.md)** 참고.
+**흐름 한 줄**: 개념 한 줄 → 즉시 200 응답 → 뒤에서 8장 생성·렌더·업로드·발행 → 약 90초 뒤 IG 피드에 캐러셀로 등장.
+
+자세한 단계별 데이터 흐름은 **[docs/architecture.md](docs/architecture.md)** 참고.
 
 ---
 
-## 폴더 구조와 각 파일의 역할
+## 각 단계에서 왜 이 스택을 썼는가
+
+| # | 단계 | 스택 | 왜 이걸 선택했는가 |
+|---|---|---|---|
+| 1 | **입력** | iOS Shortcut | 폰에서 키워드 한 줄만 치면 끝. 앱 개발 비용 0, UI 개발 비용 0. 개인 도구라 타겟 유저가 "나 하나". |
+| 2 | **서버** | Cloud Run + FastAPI | ▸ **Cloud Run**: Playwright + Chromium이 들어간 이미지는 Lambda(250MB) · GCF 용량 제한을 넘음. 컨테이너 그대로 올릴 수 있고 요청 없으면 0-스케일이라 비용도 거의 0.<br/>▸ **FastAPI**: `async` 네이티브 → `asyncio.create_task`로 fire-and-forget이 간결. Pydantic으로 요청 스키마 강제. |
+| 3 | **생성** | Gemini 2.5 Flash | ▸ **Flash**: 8장 카드 생성은 깊은 추론이 아니라 요약 + 포맷팅. 속도·단가 모두 최적 (카드 1장당 0.1센트).<br/>▸ **structured output (`response_schema`)**: 응답을 `{title, tags, cards[{id, main}]}` 스키마로 강제 → 파서·검증 코드 불필요. |
+| 4 | **렌더** | Playwright (Chromium) | ▸ **Pillow로 한글 타이포 직접 계산은 불가능** (Pretendard 커닝, 자동 줄바꿈, flexbox 재현이 지옥).<br/>▸ 브라우저 렌더 엔진을 쓰면 **`index.html` 프리뷰 == 최종 PNG**가 1:1 보장됨. 디자인은 HTML/CSS만 만지면 됨. |
+| 5 | **저장** | Google Cloud Storage | ▸ **IG Graph API는 바이트 업로드 불가** — `image_url`만 받고, 리다이렉트 미추적, `.png`/`.jpg` 확장자만 허용.<br/>▸ 공개 버킷 + 확장자 포함 파일명 + Content-Type 명시 = IG가 받아줌.<br/>▸ 7일 lifecycle 자동 삭제 (원본은 IG에 박히므로 임시 저장소 역할). |
+| 6 | **발행** | Instagram Graph API | ▸ 유일한 공식 자동 업로드 경로 (Business 계정 전용).<br/>▸ 캐러셀은 3단계 상태 머신(컨테이너 N개 → 부모 컨테이너 → publish) — `status_code=FINISHED` 폴링까지 `instagram.py`에 격리. |
+
+### 런타임 선택도 이유 있음
+
+| 설정 | 값 | 이유 |
+|---|---|---|
+| Region | `asia-northeast3` (서울) | 호출자(한국) ↔ Cloud Run 지연 최소화 |
+| Memory / CPU | 2Gi / 2 | Chromium + 8장 렌더가 1Gi 아래에서는 OOM |
+| concurrency | 1 | 한 인스턴스에 Chromium 2개 띄우면 메모리 초과 |
+| max-instances | 3 | 개인 용도라 동시성 ≤ 2, 비용 폭주 방어 |
+| `--no-cpu-throttling` | **필수** | 응답 반환 후 CPU 스로틀링되면 백그라운드 태스크가 멈춤 |
+
+---
+
+## 폴더 구조
 
 ```
 concept-archive/
 ├── index.html              # 브라우저 프리뷰 (서버 없이 디자인 확인용)
-├── shared/
-│   └── styles.css          # 디자인 토큰 (색/타이포/스페이싱) + 공통 레이아웃
-├── templates/
-│   ├── 01-overview.html    # 개요 (첫 장 고정)
-│   ├── 02-analogy.html     # 비유
-│   ├── ...
-│   └── 15-oneline.html     # 한줄요약 (마지막 장 고정)
+├── shared/styles.css       # 디자인 토큰 (색/타이포/스페이싱) + 공통 레이아웃
+├── templates/              # 카드 15종 HTML (01-overview ~ 15-oneline)
 ├── backend/
 │   ├── main.py             # FastAPI 엔드포인트 + fire-and-forget 디스패처
 │   ├── prompts.py          # 카드 15종 메타 + 시스템 프롬프트 + 응답 스키마
-│   ├── gemini_client.py    # Gemini API 얇은 래퍼 (구조화 JSON 파싱)
+│   ├── gemini_client.py    # Gemini API 얇은 래퍼
 │   ├── renderer.py         # 카드 JSON → 1080×1350 PNG (Playwright)
-│   ├── storage.py          # PNG → GCS 공개 URL (Content-Type .png 강제)
+│   ├── storage.py          # PNG → GCS 공개 URL
 │   ├── instagram.py        # IG Graph API 캐러셀 3단계 발행
 │   ├── requirements.txt
 │   └── .env.example
 ├── docs/
-│   ├── architecture.md     # 파이프라인 상세 흐름도
-│   ├── decisions.md        # 설계 결정 기록 (왜 이렇게 했는가)
+│   ├── architecture.md     # 파이프라인 상세 흐름
+│   ├── decisions.md        # 설계 결정 기록
 │   ├── design.md           # 카드 디자인 시스템 명세
 │   └── screenshots/        # README/문서용 이미지
 ├── Dockerfile              # playwright/python + Noto CJK
-└── README.md               # 이 문서
+└── README.md
 ```
-
-### 왜 이렇게 쪼개져 있나
-
-| 파일 | 역할 | 왜 따로 두는가 |
-|---|---|---|
-| `index.html` | 브라우저에서 카드 실시간 미리보기 | 서버 안 띄우고 디자인만 고치고 싶을 때. 템플릿/CSS 수정 시 즉시 반영 확인 |
-| `shared/styles.css` | 디자인 토큰 한 곳 | 색/폰트/여백 바꾸고 싶으면 이 파일만. 템플릿 15개 열어볼 필요 없음 |
-| `templates/*.html` | 카드 한 종류 = 한 파일 | 템플릿 추가/수정 시 영향 범위가 그 파일 하나로 국한 |
-| `main.py` | HTTP 진입점 | Fire-and-forget 패턴 분리 — 엔드포인트에서는 큐잉만, 실제 파이프라인은 `_do_publish` |
-| `prompts.py` | LLM 지시 단일 출처 | 프롬프트 수정 시 여기만. 템플릿 변경과 프롬프트 변경의 경계 명확 |
-| `gemini_client.py` | Gemini SDK 의존성 격리 | 모델 교체(Flash→Pro 등) 시 이 파일만. 나머지 코드는 딕셔너리만 앎 |
-| `renderer.py` | Playwright 의존성 격리 | 렌더 엔진 교체나 CSS 주입 로직 변경 시 영향 최소화 |
-| `storage.py` | GCS 업로드 규칙 격리 | Content-Type, 파일명 확장자, 캐시 헤더를 한 곳에서 제어 |
-| `instagram.py` | IG Graph API 상태 머신 | 3단계 발행 + `status_code` 폴링 로직이 복잡. 따로 빼두면 IG 정책 변경에 강함 |
 
 ---
 
