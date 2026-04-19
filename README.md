@@ -5,31 +5,11 @@
 iOS 단축어에 "양자역학"이라고 입력하면, 약 90초 뒤
 [@what_is_this.zip](https://instagram.com/what_is_this.zip) 피드에 8장짜리 캐러셀이 올라온다.
 
-<!-- ![](docs/screenshots/hero.png) -->
-
 ---
 
 ## 파이프라인
 
-```mermaid
-flowchart TD
-    A["📱 iOS Shortcut<br/><i>concept 한 줄</i>"]
-    B["☁️ Cloud Run · FastAPI<br/><i>fire-and-forget 디스패처</i>"]
-    C["🧠 Gemini 3 Flash<br/><i>구조화 JSON · 8장 생성</i>"]
-    D["🖼 Playwright<br/><i>HTML → PNG 1080×1350</i>"]
-    E["📦 Google Cloud Storage<br/><i>공개 .png URL · 7일 만료</i>"]
-    F["📸 Instagram Graph API<br/><i>캐러셀 발행 (3-step)</i>"]
-
-    A -->|"POST /publish"| B
-    B -.->|"200 OK 즉시"| A
-    B --> C --> D --> E --> F
-    F -.->|"media_id"| A
-
-    classDef client fill:#0066FF,stroke:#0044cc,color:#fff,stroke-width:2px
-    classDef server fill:#1a1a1a,stroke:#666,color:#fff
-    class A client
-    class B,C,D,E,F server
-```
+![](docs/screenshots/pipeline.png)
 
 개념 한 줄 → 즉시 200 응답 → 뒤에서 8장 생성·렌더·업로드·발행 → 약 90초 뒤 IG 피드에 캐러셀로 등장.
 
@@ -47,6 +27,19 @@ flowchart TD
 | **발행** | Instagram Graph API | Business 계정 유일한 공식 경로. 캐러셀은 3단계 상태 머신(컨테이너→부모→publish). |
 
 더 깊은 설계 근거는 **[docs/decisions.md](docs/decisions.md)**, 단계별 상세 흐름은 **[docs/pipeline.md](docs/pipeline.md)**.
+
+---
+
+## 템플릿 예시
+
+"더닝-크루거 효과"라는 개념으로 생성한 카드뉴스 중 일부. 전체 15종의 템플릿 규격은 **[docs/design.md](docs/design.md)** 참고.
+
+| | | |
+|:-:|:-:|:-:|
+| ![](docs/screenshots/template-01-overview.png) | ![](docs/screenshots/template-03-steps.png) | ![](docs/screenshots/template-07-comparison.png) |
+| **01 · 개요** (표지) | **03 · 단계** | **07 · 비교** |
+| ![](docs/screenshots/template-10-timeline.png) | ![](docs/screenshots/template-15-oneline.png) | |
+| **10 · 타임라인** | **15 · 한줄요약** (마지막) | |
 
 ---
 
