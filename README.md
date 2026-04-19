@@ -7,7 +7,7 @@ iOS 단축어에 "양자역학"이라고 입력하면, 약 90초 뒤
 
 ---
 
-## 템플릿 예시
+## 🖼 템플릿 예시
 
 "더닝-크루거 효과"라는 개념으로 실제 생성된 카드뉴스. 01~03번을 먼저 보여주고, 04~15번은 펼치기 안에 있음. 디자인 규격은 **[docs/design.md](docs/design.md)** 참고.
 
@@ -36,56 +36,43 @@ iOS 단축어에 "양자역학"이라고 입력하면, 약 90초 뒤
 
 ---
 
-## 파이프라인
+## 🔄 파이프라인
 
 ```mermaid
 flowchart LR
-    A("📱<br/>**iOS Shortcut**<br/><code>concept</code>")
-    B("☁️<br/>**Cloud Run**<br/>FastAPI")
-    C("🧠<br/>**Gemini 3**<br/>Flash")
-    D("🖼<br/>**Playwright**<br/>Chromium")
-    E("📦<br/>**GCS**<br/>public .png")
-    F("📸<br/>**Instagram**<br/>Graph API")
+    A["📱<br/>iOS Shortcut"]:::client
+    B["☁️<br/>Cloud Run<br/>FastAPI"]:::infra
+    C["🧠<br/>Gemini 3 Flash"]:::gen
+    D["🖼<br/>Playwright<br/>Chromium"]:::infra
+    E["📦<br/>Cloud Storage"]:::infra
+    F["📸<br/>Instagram<br/>Graph API"]:::ext
 
-    A ==>|"POST /publish"| B
-    B -.->|"200 OK"| A
-    B ==> C ==> D ==> E ==> F
+    A -->|"① POST /publish"| B
+    B -.->|"200 OK (즉시)"| A
+    B -->|"② 8장 생성"| C
+    C -->|"③ HTML→PNG"| D
+    D -->|"④ 업로드"| E
+    E -->|"⑤ 캐러셀 발행"| F
     F -.->|"media_id"| A
 
-    classDef client fill:#0066FF,stroke:#0044cc,color:#fff,stroke-width:2px,rx:12,ry:12
-    classDef gen fill:#FFF4E0,stroke:#E8A63B,color:#6B4A10,stroke-width:1.5px,rx:12,ry:12
-    classDef infra fill:#F5F5F5,stroke:#BBB,color:#222,stroke-width:1.5px,rx:12,ry:12
-    classDef ext fill:#FFE6EE,stroke:#D94C7A,color:#6B1733,stroke-width:1.5px,rx:12,ry:12
-    class A client
-    class B,D infra
-    class C gen
-    class E infra
-    class F ext
+    classDef client fill:#0066FF,stroke:#0044cc,color:#fff,stroke-width:2px
+    classDef gen fill:#FFF4E0,stroke:#E8A63B,color:#6B4A10,stroke-width:1.5px
+    classDef infra fill:#F5F5F5,stroke:#BBB,color:#222,stroke-width:1.5px
+    classDef ext fill:#FFE6EE,stroke:#D94C7A,color:#6B1733,stroke-width:1.5px
 
     linkStyle 0,2,3,4,5 stroke:#0066FF,stroke-width:2px
-    linkStyle 1,6 stroke:#888,stroke-dasharray:4 4
+    linkStyle 1,6 stroke:#999,stroke-dasharray:5 5
 ```
 
-개념 한 줄 → 즉시 200 응답 → 뒤에서 8장 생성·렌더·업로드·발행 → 약 90초 뒤 IG 피드에 캐러셀로 등장.
+> **①** 폰에서 POST → **즉시 200 OK 반환** (fire-and-forget)<br>
+> **② → ⑤** 백그라운드에서 `Gemini 생성 → Playwright 렌더 → GCS 업로드 → IG 발행`<br>
+> 약 **90초 뒤** `media_id`와 함께 IG 피드에 캐러셀 등장 → iOS가 알림 표시
+
+**색상 범례** · 🟦 진입점(iOS) · ⬜ GCP 인프라(Cloud Run·Playwright·GCS) · 🟨 LLM(Gemini) · 🟥 외부 API(Instagram)
 
 ---
 
-## 각 단계에서 왜 이 스택을 썼는가
-
-| 단계 | 스택 | 왜 |
-|---|---|---|
-| **입력** | iOS Shortcut | 폰에서 키워드 한 줄로 트리거. 앱·UI 개발 비용 0. |
-| **서버** | Cloud Run + FastAPI | Playwright+Chromium 이미지는 Lambda 용량 제한을 넘음 → Cloud Run이 유일한 선택지. FastAPI의 `async`로 fire-and-forget 패턴이 간결해짐. |
-| **생성** | Gemini 3 Flash | 8장 카드는 요약+포맷팅 작업이라 Flash로 충분. `response_schema`로 JSON 강제 → 파서 불필요. |
-| **렌더** | Playwright (Chromium) | 한글 타이포(Pretendard, 커닝, flexbox)를 Pillow로 재현 불가. 브라우저 렌더 == 최종 PNG 1:1 보장. |
-| **저장** | Google Cloud Storage | IG는 바이트 업로드 불가, `image_url`만 받음. 공개 버킷 + 확장자 + Content-Type 맞춰야 받아줌. |
-| **발행** | Instagram Graph API | Business 계정 유일한 공식 경로. 캐러셀은 3단계 상태 머신(컨테이너→부모→publish). |
-
-더 깊은 설계 근거는 **[docs/decisions.md](docs/decisions.md)**, 단계별 상세 흐름은 **[docs/pipeline.md](docs/pipeline.md)**.
-
----
-
-## 기술 스택
+## 🧱 기술 스택
 
 | 레이어 | 사용 기술 |
 |---|---|
@@ -101,7 +88,7 @@ flowchart LR
 
 ---
 
-## 폴더 구조
+## 📁 폴더 구조
 
 ```
 concept-archive/
@@ -124,7 +111,7 @@ concept-archive/
 
 ---
 
-## 시작하기
+## 🚀 시작하기
 
 ### 로컬
 
