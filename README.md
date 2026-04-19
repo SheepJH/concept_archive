@@ -7,16 +7,22 @@ iOS 단축어에 "양자역학"이라고 입력하면, 약 90초 뒤
 
 ---
 
-## 템플릿 예시
+## 템플릿 예시 (15종 전부)
 
-"더닝-크루거 효과"라는 개념으로 생성한 카드뉴스 중 일부. 전체 15종의 템플릿 규격은 **[docs/design.md](docs/design.md)** 참고.
+"더닝-크루거 효과"라는 개념으로 실제 생성된 카드뉴스. 디자인 규격은 **[docs/design.md](docs/design.md)** 참고.
 
 | | | |
 |:-:|:-:|:-:|
-| ![](docs/screenshots/template-01-overview.png) | ![](docs/screenshots/template-03-steps.png) | ![](docs/screenshots/template-07-comparison.png) |
-| **01 · 개요** (표지) | **03 · 단계** | **07 · 비교** |
-| ![](docs/screenshots/template-10-timeline.png) | ![](docs/screenshots/template-15-oneline.png) | |
-| **10 · 타임라인** | **15 · 한줄요약** (마지막) | |
+| ![](docs/screenshots/template-01-overview.png) | ![](docs/screenshots/template-02-analogy.png) | ![](docs/screenshots/template-03-steps.png) |
+| **01 · 개요** (표지 고정) | **02 · 비유** | **03 · 단계** |
+| ![](docs/screenshots/template-04-matrix.png) | ![](docs/screenshots/template-05-formula.png) | ![](docs/screenshots/template-06-chain.png) |
+| **04 · 매트릭스** | **05 · 공식** | **06 · 인과 체인** |
+| ![](docs/screenshots/template-07-comparison.png) | ![](docs/screenshots/template-08-proscons.png) | ![](docs/screenshots/template-09-spectrum.png) |
+| **07 · 비교** | **08 · 장단점** | **09 · 스펙트럼** |
+| ![](docs/screenshots/template-10-timeline.png) | ![](docs/screenshots/template-11-realcase.png) | ![](docs/screenshots/template-12-misconception.png) |
+| **10 · 타임라인** | **11 · 실생활 사례** | **12 · 오해와 진실** |
+| ![](docs/screenshots/template-13-faq.png) | ![](docs/screenshots/template-14-checklist.png) | ![](docs/screenshots/template-15-oneline.png) |
+| **13 · FAQ** | **14 · 체크리스트** | **15 · 한줄요약** (마지막 고정) |
 
 ---
 
