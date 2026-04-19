@@ -9,7 +9,33 @@ iOS 단축어에 "양자역학"이라고 입력하면, 약 90초 뒤
 
 ## 파이프라인
 
-![](docs/screenshots/pipeline.png)
+```mermaid
+flowchart LR
+    A("📱<br/>**iOS Shortcut**<br/><code>concept</code>")
+    B("☁️<br/>**Cloud Run**<br/>FastAPI")
+    C("🧠<br/>**Gemini 3**<br/>Flash")
+    D("🖼<br/>**Playwright**<br/>Chromium")
+    E("📦<br/>**GCS**<br/>public .png")
+    F("📸<br/>**Instagram**<br/>Graph API")
+
+    A ==>|"POST /publish"| B
+    B -.->|"200 OK"| A
+    B ==> C ==> D ==> E ==> F
+    F -.->|"media_id"| A
+
+    classDef client fill:#0066FF,stroke:#0044cc,color:#fff,stroke-width:2px,rx:12,ry:12
+    classDef gen fill:#FFF4E0,stroke:#E8A63B,color:#6B4A10,stroke-width:1.5px,rx:12,ry:12
+    classDef infra fill:#F5F5F5,stroke:#BBB,color:#222,stroke-width:1.5px,rx:12,ry:12
+    classDef ext fill:#FFE6EE,stroke:#D94C7A,color:#6B1733,stroke-width:1.5px,rx:12,ry:12
+    class A client
+    class B,D infra
+    class C gen
+    class E infra
+    class F ext
+
+    linkStyle 0,2,3,4,5 stroke:#0066FF,stroke-width:2px
+    linkStyle 1,6 stroke:#888,stroke-dasharray:4 4
+```
 
 개념 한 줄 → 즉시 200 응답 → 뒤에서 8장 생성·렌더·업로드·발행 → 약 90초 뒤 IG 피드에 캐러셀로 등장.
 
