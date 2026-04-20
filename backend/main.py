@@ -15,8 +15,9 @@ from fastapi import FastAPI, Header, HTTPException, Request
 import telegram as tg
 from gemini_client import generate_cards
 from instagram import publish_carousel
-from prompts import build_system_prompt, load_template_html
+from prompts import build_system_prompt, load_manifest, load_template_html
 from renderer import (
+    build_card_by_id,
     build_template_css_map,
     load_shared_css,
     render_cards_to_png,
@@ -34,6 +35,9 @@ app = FastAPI(title="card-news", version="0.1.0")
 
 
 # Loaded once at startup ------------------------------------------------------
+_CARDS: list[dict] = []
+_STAGES: list[dict] = []
+_CARD_BY_ID: dict[str, dict] = {}
 _TEMPLATES_HTML: dict[str, str] = {}
 _TEMPLATE_CSS: dict[str, str] = {}
 _SHARED_CSS: str = ""
@@ -42,11 +46,15 @@ _SYSTEM_PROMPT: str = ""
 
 @app.on_event("startup")
 def _startup() -> None:
-    global _TEMPLATES_HTML, _TEMPLATE_CSS, _SHARED_CSS, _SYSTEM_PROMPT
-    _TEMPLATES_HTML = load_template_html(TEMPLATES_DIR)
+    global _CARDS, _STAGES, _CARD_BY_ID, _TEMPLATES_HTML, _TEMPLATE_CSS, _SHARED_CSS, _SYSTEM_PROMPT
+    manifest = load_manifest(TEMPLATES_DIR)
+    _CARDS = manifest["cards"]
+    _STAGES = manifest["stages"]
+    _CARD_BY_ID = build_card_by_id(_CARDS)
+    _TEMPLATES_HTML = load_template_html(TEMPLATES_DIR, _CARDS)
     _TEMPLATE_CSS = build_template_css_map(_TEMPLATES_HTML)
     _SHARED_CSS = load_shared_css(SHARED_DIR)
-    _SYSTEM_PROMPT = build_system_prompt(_TEMPLATES_HTML)
+    _SYSTEM_PROMPT = build_system_prompt(_TEMPLATES_HTML, _CARDS, _STAGES)
     log.info("Loaded %d templates", len(_TEMPLATES_HTML))
 
 
@@ -87,7 +95,7 @@ async def _do_telegram_publish(chat_id: int, concept: str) -> None:
         # Stage 1: Gemini ---------------------------------------------------
         try:
             log.info("[tg] generate concept=%r", concept)
-            result = await generate_cards(concept, _SYSTEM_PROMPT, None)
+            result = await generate_cards(concept, _SYSTEM_PROMPT)
             title = result.get("title", "")
             tags = result.get("tags", []) or []
             cards = result["cards"]
@@ -99,7 +107,7 @@ async def _do_telegram_publish(chat_id: int, concept: str) -> None:
         # Stage 2: Playwright render ---------------------------------------
         try:
             log.info("[tg] rendering %d cards", len(cards))
-            pngs = await render_cards_to_png(cards, tags, _SHARED_CSS, _TEMPLATE_CSS)
+            pngs = await render_cards_to_png(cards, tags, _SHARED_CSS, _TEMPLATE_CSS, _CARD_BY_ID)
         except Exception as e:
             log.exception("[tg] render failed")
             await _notify_err(chat_id, "카드 렌더링", e)

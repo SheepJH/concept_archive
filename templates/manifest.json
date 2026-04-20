@@ -1,0 +1,28 @@
+{
+  "cards": [
+    {"id": "01", "file": "01-overview.html",   "name": "개요",         "cls": "overview", "label": "개요",         "stage": 1},
+    {"id": "02", "file": "02-analogy.html",    "name": "비유",         "cls": "analogy",  "label": "비유",         "stage": 2},
+    {"id": "03", "file": "03-steps.html",      "name": "단계",         "cls": "steps",    "label": "단계",         "stage": 3},
+    {"id": "04", "file": "04-matrix.html",     "name": "2×2 매트릭스", "cls": "matrix",   "label": "매트릭스",     "stage": 3},
+    {"id": "05", "file": "05-formula.html",    "name": "공식·정의",    "cls": "formula",  "label": "공식",         "stage": 3},
+    {"id": "06", "file": "06-chain.html",      "name": "인과사슬",     "cls": "chain",    "label": "인과",         "stage": 3},
+    {"id": "07", "file": "07-comparison.html", "name": "비교",         "cls": "cmp",      "label": "비교",         "stage": 4},
+    {"id": "08", "file": "08-proscons.html",   "name": "빛과 그림자",  "cls": "pc",       "label": "빛과 그림자",  "stage": 4},
+    {"id": "09", "file": "09-spectrum.html",   "name": "스펙트럼",     "cls": "spec",     "label": "스펙트럼",     "stage": 4},
+    {"id": "10", "file": "10-timeline.html",   "name": "타임라인",     "cls": "timeline", "label": "타임라인",     "stage": 5},
+    {"id": "11", "file": "11-realcase.html",   "name": "실생활 사례",  "cls": "real",     "label": "실생활 사례",  "stage": 5},
+    {"id": "13", "file": "13-faq.html",        "name": "FAQ",          "cls": "faq",      "label": "FAQ",          "stage": 6},
+    {"id": "14", "file": "14-checklist.html",  "name": "체크리스트",   "cls": "check",    "label": "체크리스트",   "stage": 7},
+    {"id": "15", "file": "15-oneline.html",    "name": "한줄요약",     "cls": "oneline",  "label": "한줄요약",     "stage": 8}
+  ],
+  "stages": [
+    {"num": 1, "name": "개요",   "intent": "Intro",     "policy": "fixed"},
+    {"num": 2, "name": "비유",   "intent": "Grasp",     "policy": "fixed"},
+    {"num": 3, "name": "원리",   "intent": "Mechanism", "policy": "pick_one"},
+    {"num": 4, "name": "대조",   "intent": "Contrast",  "policy": "pick_one"},
+    {"num": 5, "name": "사례",   "intent": "Validate",  "policy": "pick_one"},
+    {"num": 6, "name": "질문",   "intent": "Clarify",   "policy": "fixed"},
+    {"num": 7, "name": "적용",   "intent": "Apply",     "policy": "fixed"},
+    {"num": 8, "name": "마무리", "intent": "Close",     "policy": "fixed"}
+  ]
+}

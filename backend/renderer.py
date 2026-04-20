@@ -8,8 +8,6 @@ from typing import Iterable
 
 from playwright.async_api import async_playwright
 
-from prompts import CARD_BY_ID
-
 CANVAS_W = 1080
 CANVAS_H = 1350
 
@@ -26,6 +24,11 @@ def build_template_css_map(template_html_by_id: dict[str, str]) -> dict[str, str
     return {cid: extract_template_css(html) for cid, html in template_html_by_id.items()}
 
 
+def build_card_by_id(cards: list[dict]) -> dict[str, dict]:
+    """Indexed lookup from a cards list (from manifest.json)."""
+    return {c["id"]: c for c in cards}
+
+
 def build_card_html(
     card: dict,
     page: int,
@@ -33,9 +36,10 @@ def build_card_html(
     tags: list[str],
     shared_css: str,
     template_css_by_id: dict[str, str],
+    card_by_id: dict[str, dict],
 ) -> str:
     """Mirror of buildSrcdoc() in index.html, fully self-contained (no external links)."""
-    meta = CARD_BY_ID.get(card["id"])
+    meta = card_by_id.get(card["id"])
     if not meta:
         raise ValueError(f"Unknown card id: {card['id']}")
     pg = f"{page:02d}"
@@ -75,11 +79,12 @@ async def render_cards_to_png(
     tags: list[str],
     shared_css: str,
     template_css_by_id: dict[str, str],
+    card_by_id: dict[str, dict],
 ) -> list[bytes]:
     """Render every card to a PNG in parallel, return list of PNG byte blobs."""
     total = len(cards)
     htmls = [
-        build_card_html(card, i + 1, total, tags, shared_css, template_css_by_id)
+        build_card_html(card, i + 1, total, tags, shared_css, template_css_by_id, card_by_id)
         for i, card in enumerate(cards)
     ]
 
