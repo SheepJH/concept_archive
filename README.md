@@ -97,25 +97,25 @@ sequenceDiagram
     participant B as ☁️ 백엔드<br/>(Cloud Run)
     participant I as 📸 Instagram
 
-    U->>T: ① "더닝-크루거 효과"
-    T->>B: ② POST /tg (webhook)
-    B-->>T: ③ 200 OK (즉시)
-    T-->>U: ④ "⏳ 생성 중..."
+    U->>T: 1️⃣ "더닝-크루거 효과"
+    T->>B: 2️⃣ POST /tg (webhook)
+    B-->>T: 3️⃣ 200 OK (즉시)
+    T-->>U: 4️⃣ "⏳ 생성 중..."
 
     Note over B: 🧠 Gemini → 카드 8장 JSON
     Note over B: 🖼 Playwright → 1080×1350 PNG × 8
     Note over B: 📦 GCS 업로드 → public URLs
 
-    B->>T: ⑤ sendMediaGroup (앨범)
-    T-->>U: ⑥ 앨범 + [🔁 다시 만들기 · 📤 인스타 아카이브]
+    B->>T: 5️⃣ sendMediaGroup (앨범)
+    T-->>U: 6️⃣ 앨범 + [🔁 다시 만들기 · 📤 인스타 아카이브]
 
     Note over U,I: ── IG엔 아직 아무것도 안 올라감 ──
 
-    U->>T: ⑦ 📤 아카이브 버튼
-    T->>B: ⑧ callback_query
-    B->>I: ⑨ 3단계 캐러셀 발행
-    I-->>B: ⑩ media_id
-    B-->>U: ⑪ "✅ 완료"
+    U->>T: 7️⃣ 📤 아카이브 버튼
+    T->>B: 8️⃣ callback_query
+    B->>I: 9️⃣ 3단계 캐러셀 발행
+    I-->>B: 🔟 media_id
+    B-->>U: ✅ 완료 메시지
 ```
 
 ---
