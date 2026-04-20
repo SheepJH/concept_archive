@@ -37,52 +37,6 @@
 
 ---
 
-## 🔄 파이프라인
-
-```mermaid
-sequenceDiagram
-    autonumber
-    actor U as 👤 사용자
-    participant T as 📨 Telegram Bot
-    participant R as ☁️ Cloud Run<br/>(FastAPI)
-    participant G as 🧠 Gemini 3 Flash
-    participant P as 🖼 Playwright
-    participant S as 📦 GCS
-    participant I as 📸 Instagram
-
-    U->>T: "양자역학" 메시지
-    T->>R: POST /tg (webhook)
-    R-->>T: 200 OK (즉시)
-
-    rect rgb(240, 247, 255)
-    Note over R,S: 백그라운드 파이프라인 · 60~90초
-    R->>G: 개념 → 카드 8장 생성
-    G-->>R: title / tags / cards (JSON)
-    R->>P: HTML + CSS 렌더
-    P-->>R: 1080×1350 PNG × 8
-    R->>S: 업로드
-    S-->>R: public .png URLs
-    end
-
-    R->>T: sendMediaGroup (앨범 8장)
-    T->>U: 📥 앨범 답장 + [🔁 다시 만들기 | 📤 인스타 아카이브]
-
-    Note over U,I: ——— 여기까지는 IG에 아무것도 안 올라감 ———
-
-    U->>T: 📤 버튼 클릭
-    T->>R: callback_query
-    R->>I: 캐러셀 3단계 발행
-    I-->>R: media_id
-    R->>T: ✅ 완료 메시지
-```
-
-**핵심 포인트**
-- **프리뷰 먼저, 발행은 선택** — 카드가 먼저 텔레그램에 답장으로 오고, `📤` 버튼을 눌러야만 IG에 올라감. 실패작이 자동 발행되는 일 없음.
-- **Fire-and-forget** — `/tg`는 즉시 200을 반환하고 파이프라인은 `asyncio.create_task`로 뒷단에서 실행. 텔레그램 웹훅 타임아웃 회피.
-- **Chromium 렌더링으로 픽셀 일치** — 브라우저로 보는 HTML 템플릿 결과 = IG에 올라가는 결과.
-
----
-
 ## 🧱 기술 스택
 
 | 레이어 | 사용 기술 |
