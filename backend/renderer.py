@@ -88,7 +88,9 @@ async def render_cards_to_png(
         try:
             context = await browser.new_context(
                 viewport={"width": CANVAS_W, "height": CANVAS_H},
-                device_scale_factor=1,
+                # 2x supersampling: render at 2160x2700 so IG's downscale to 1080
+                # produces sharper text antialiasing.
+                device_scale_factor=2,
             )
             try:
                 async def render_one(html: str) -> bytes:
