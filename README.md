@@ -1,6 +1,6 @@
 # concept-archive
 
-> 개념 하나를 던지면, 인스타그램에 카드뉴스 8장이 올라간다.
+> 모르는 개념을 던지면, 이해하기 쉬운 카드뉴스 8장으로 돌려받고 — 인스타그램에 아카이브한다.
 
 <p align="center">
   <img src="https://img.shields.io/badge/Python_3.13-3776AB?style=flat-square&logo=python&logoColor=white" alt="Python 3.13"/>
@@ -13,15 +13,16 @@
   <img src="https://img.shields.io/badge/Instagram_API-E4405F?style=flat-square&logo=instagram&logoColor=white" alt="Instagram Graph API"/>
 </p>
 
-텔레그램 봇에 "양자역학"이라고 보내면, 약 90초 뒤 봇이 8장짜리 카드뉴스를
-앨범으로 답장한다. 마음에 들면 **📤 인스타 아카이브** 버튼을 눌러
-[@what_is_this.zip](https://instagram.com/what_is_this.zip)에 캐러셀로 발행.
+모르는 개념이 생길 때마다 텔레그램 봇에 "양자역학"처럼 한 줄 보내면,
+약 90초 뒤 봇이 **나만의 과외 노트 같은 카드뉴스 8장**을 앨범으로 답장한다.
+이해가 됐다 싶으면 **📤 인스타 아카이브** 버튼을 눌러
+[@what_is_this.zip](https://instagram.com/what_is_this.zip)에 남겨둠 — 나중에 다시 꺼내 볼 수 있게.
 
 ---
 
 ## 🖼 템플릿 예시
 
-"더닝-크루거 효과"라는 개념으로 실제 생성된 카드뉴스. 01~03번을 먼저 보여주고, 04~15번은 펼치기 안에 있음. 디자인 규격은 **[docs/design.md](docs/design.md)** 참고.
+"더닝-크루거 효과"를 봇에 보냈을 때 실제로 받아본 카드 8장. 봇은 개념마다 어울리는 템플릿을 **15종 중에서 골라** 조합하고, **01 · 개요**(표지)와 **15 · 한줄요약**(마지막)은 고정이다. 아래는 01~03번만 먼저 보여주고, 나머지 12종(04~15)은 펼치기 안에 있음. 디자인 규격은 **[docs/design.md](docs/design.md)** 참고.
 
 | | | |
 |:-:|:-:|:-:|
