@@ -22,7 +22,7 @@
 
 ## 🖼 템플릿 예시
 
-"더닝-크루거 효과"를 봇에 보냈을 때 실제로 받아본 카드 8장. 봇은 개념마다 어울리는 템플릿을 **15종 중에서 골라** 조합하고, **01 · 개요**(표지)와 **15 · 한줄요약**(마지막)은 고정이다. 아래는 01~03번만 먼저 보여주고, 나머지 12종(04~15)은 펼치기 안에 있음. 디자인 규격은 **[docs/design.md](docs/design.md)** 참고.
+"더닝-크루거 효과"를 봇에 보냈을 때 실제로 받아본 카드 8장. 봇은 개념마다 어울리는 템플릿을 **15종 중에서 골라** 조합하고, **01 · 개요**(표지)와 **15 · 한줄요약**(마지막)은 고정이다. 아래는 01–03번만 먼저 보여주고, 나머지 12종(04–15)은 펼치기 안에 있음. 디자인 규격은 **[docs/design.md](docs/design.md)** 참고.
 
 | | | |
 |:-:|:-:|:-:|
@@ -30,7 +30,7 @@
 | **01 · 개요** (표지 고정) | **02 · 비유** | **03 · 단계** |
 
 <details>
-<summary><b>📇 나머지 12종 펼치기 (04~15)</b></summary>
+<summary><b>📇 나머지 12종 펼치기 (04–15)</b></summary>
 
 <br>
 
@@ -139,7 +139,7 @@ sequenceDiagram
 
 ### 🎨 렌더링 — JSON → PNG 8장
 - **Playwright 1.48 (Chromium)** — 1080×1350, 2x 슈퍼샘플링
-- **HTML5 + CSS3** · 카드 15종은 [`templates/01~15.html`](templates/) 순수 HTML
+- **HTML5 + CSS3** · 카드 15종은 [`templates/01–15.html`](templates/) 순수 HTML
 - **Pretendard** · **Inter** 웹폰트 (CDN)
 
 ### 📦 저장 & 발행
@@ -164,7 +164,7 @@ sequenceDiagram
 |---|---|---:|---|
 | 📨 Telegram Bot API | 무료 | ― | 웹훅/미디어 그룹 전송 무료 |
 | ☁️ Cloud Run | 2 vCPU × ~90s + 2 GiB 메모리 사용 시간 | ≈ 0원 | **월 1,000회까진 무료 티어 안** |
-| 🧠 Gemini 3 Flash | Google AI Studio 무료 티어 (하루 ~20회 한도) | ≈ 0원 | 개인 용도(하루 1~2회)면 **항상 무료 범위** |
+| 🧠 Gemini 3 Flash | Google AI Studio 무료 티어 (하루 약 20회 한도) | ≈ 0원 | 개인 용도(하루 1–2회)면 **항상 무료 범위** |
 | 🎨 Playwright | Cloud Run 안에서 실행 | ― | 별도 과금 없음 (Cloud Run 비용에 포함) |
 | 📦 Cloud Storage | PUT 8회 · 2.4 MB 저장 (7일 TTL) · IG egress | < 0.1원 | 7일 후 자동 삭제로 저장 비용 거의 0 |
 | 🔐 Secret Manager | 시크릿 접근 ops | ― | 월 10k 접근 무료 티어 안 |
@@ -179,15 +179,15 @@ sequenceDiagram
 |---|---:|---|
 | Cloud Run | **0원** | 요청 없으면 인스턴스 0개 → 안 돌면 과금 없음 |
 | Cloud Storage (GCS) | **< 10원** | 7일 TTL로 버킷 거의 비어 있음 |
-| Artifact Registry (Docker 이미지) | ≈ 50~100원 | Cloud Build가 쌓아둔 이미지 1~2 GB 상시 저장 |
+| Artifact Registry (Docker 이미지) | ≈ 50–100원 | Cloud Build가 쌓아둔 이미지 1–2 GB 상시 저장 |
 | Secret Manager (5개 시크릿) | **0원** | 시크릿 활성 버전 6개 무료 |
 
 ### 비용 포인트
 
-- **Gemini 무료 티어** — Google AI Studio 기준 하루 ~20회 무료 (모델별 상이). 혼자 모르는 개념 정리할 때 하루 몇 번 쓰는 용도면 **절대 안 넘음**. 넘어도 요청당 2원 수준
+- **Gemini 무료 티어** — Google AI Studio 기준 하루 약 20회 무료 (모델별 상이). 혼자 모르는 개념 정리할 때 하루 몇 번 쓰는 용도면 **절대 안 넘음**. 넘어도 요청당 2원 수준
 - **`--no-cpu-throttling` 필수 트레이드오프** — 응답 반환 후에도 CPU가 돌아야 백그라운드 파이프라인이 살아남음. 응답 후 ~90초간 CPU 과금 지속. 이걸 빼면 파이프라인 자체가 죽음 → **필수**
 - **Cloud Run 무료 티어** — 월 180k vCPU-sec · 360k GiB-sec · 2M 요청. 요청당 ~360 vCPU-sec 쓰니 **월 500회까진 확실히 무료**
-- **실질 월 비용** — 하루 1~2회 사용 시 **사실상 0원**. Artifact Registry Docker 이미지 저장만 월 50~100원 정도 고정으로 나옴
+- **실질 월 비용** — 하루 1–2회 사용 시 **사실상 0원**. Artifact Registry Docker 이미지 저장만 월 50–100원 정도 고정으로 나옴
 
 ---
 
@@ -255,4 +255,4 @@ gcloud run deploy card-news \
      -d "secret_token=<API_SECRET>"
    ```
    (`secret_token`은 `API_SECRET`과 동일한 값을 사용 — 봇이 보내는 `X-Telegram-Bot-Api-Secret-Token` 헤더로 검증)
-3. 봇과 대화 시작 → 개념 메시지 보내기 → 1~2분 후 카드뉴스 앨범 도착 → `📤 인스타 아카이브` 버튼으로 발행
+3. 봇과 대화 시작 → 개념 메시지 보내기 → 1–2분 후 카드뉴스 앨범 도착 → `📤 인스타 아카이브` 버튼으로 발행
