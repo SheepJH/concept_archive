@@ -54,17 +54,17 @@
 
 ```mermaid
 flowchart LR
-    A["👤<br/><b>개념 입력</b>"]
-    B["📨<br/><b>Telegram</b><br/><sub>webhook</sub>"]
-    C["☁️<br/><b>Cloud Run</b><br/><sub>FastAPI · fire-and-forget</sub>"]
-    D["🧠<br/><b>Gemini 3</b><br/><sub>카드 8장 JSON</sub>"]
-    E["🖼<br/><b>Playwright</b><br/><sub>HTML → PNG × 8</sub>"]
-    F["📦<br/><b>GCS</b><br/><sub>public URLs</sub>"]
-    G["📥<br/><b>앨범 프리뷰</b><br/><sub>+ 🔁 · 📤 버튼</sub>"]
-    H["📸<br/><b>Instagram</b><br/><sub>캐러셀 발행</sub>"]
+    A("👤 개념")
+    B("📨 Telegram")
+    C("☁️ Cloud Run")
+    D("🧠 Gemini")
+    E("🖼 Playwright")
+    F("📦 GCS")
+    G("📥 프리뷰")
+    H("📸 Instagram")
 
     A --> B --> C --> D --> E --> F --> G
-    G -. "📤 버튼 클릭 시" .-> H
+    G -. "📤" .-> H
 
     classDef user fill:#1f1f1f,stroke:#555,color:#fff
     classDef tg fill:#26A5E4,stroke:#1d8bc0,color:#fff
@@ -84,6 +84,8 @@ flowchart LR
     class G out
     class H ig
 ```
+
+> 실선 = 자동 실행 · 점선 = 사용자가 `📤` 버튼 눌러야 발동
 
 ### 시간 순서
 
