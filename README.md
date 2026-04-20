@@ -13,7 +13,7 @@
   <img src="https://img.shields.io/badge/Instagram_API-E4405F?style=flat-square&logo=instagram&logoColor=white" alt="Instagram Graph API"/>
 </p>
 
-모르는 개념이 생길 때마다 텔레그램 봇에 "양자역학"처럼 한 줄 보내면,
+모르는 개념이 생길 때마다 텔레그램 봇에 "더닝-크루거 효과"처럼 한 줄 보내면,
 약 90초 뒤 봇이 **나만의 과외 노트 같은 카드뉴스 8장**을 앨범으로 답장한다.
 이해가 됐다 싶으면 **📤 인스타 아카이브** 버튼을 눌러
 [@what_is_this.zip](https://instagram.com/what_is_this.zip)에 남겨둠 — 나중에 다시 꺼내 볼 수 있게.
