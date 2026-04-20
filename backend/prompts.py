@@ -2,45 +2,86 @@
 
 Mirrors the CARDS / buildSystemPrompt logic from index.html so that the
 backend produces identical card structure as the in-browser flow.
+
+Metadata is loaded from templates/manifest.json (Single Source of Truth).
 """
+import json
 from pathlib import Path
 
-# Order matches index.html CARDS array. id is the template number ("01"..."15").
-CARDS = [
-    {"id": "01", "file": "01-overview.html",      "name": "개요",        "cls": "overview", "label": "개요",        "fixed": "first", "stage": 1},
-    {"id": "02", "file": "02-analogy.html",       "name": "비유",        "cls": "analogy",  "label": "비유",                              "stage": 2},
-    {"id": "03", "file": "03-steps.html",         "name": "단계",        "cls": "steps",    "label": "단계",                              "stage": 3},
-    {"id": "04", "file": "04-matrix.html",        "name": "2×2 매트릭스","cls": "matrix",   "label": "매트릭스",                          "stage": 3},
-    {"id": "05", "file": "05-formula.html",       "name": "공식·정의",   "cls": "formula",  "label": "공식",                              "stage": 3},
-    {"id": "06", "file": "06-chain.html",         "name": "인과사슬",    "cls": "chain",    "label": "인과",                              "stage": 3},
-    {"id": "07", "file": "07-comparison.html",    "name": "비교",        "cls": "cmp",      "label": "비교",                              "stage": 4},
-    {"id": "08", "file": "08-proscons.html",      "name": "빛과 그림자", "cls": "pc",       "label": "빛과 그림자",                       "stage": 4},
-    {"id": "09", "file": "09-spectrum.html",      "name": "스펙트럼",    "cls": "spec",     "label": "스펙트럼",                          "stage": 4},
-    {"id": "10", "file": "10-timeline.html",      "name": "타임라인",    "cls": "timeline", "label": "타임라인",                          "stage": 5},
-    {"id": "11", "file": "11-realcase.html",      "name": "실생활 사례", "cls": "real",     "label": "실생활 사례",                       "stage": 5},
-    {"id": "12", "file": "12-misconception.html", "name": "오해와 진실", "cls": "misc",     "label": "오해와 진실",                       "stage": 6},
-    {"id": "13", "file": "13-faq.html",           "name": "FAQ",         "cls": "faq",      "label": "FAQ",                               "stage": 6},
-    {"id": "14", "file": "14-checklist.html",     "name": "체크리스트",  "cls": "check",    "label": "체크리스트",                        "stage": 7},
-    {"id": "15", "file": "15-oneline.html",       "name": "한줄요약",    "cls": "oneline",  "label": "한줄요약",    "fixed": "last",      "stage": 8},
-]
 
-CARD_BY_ID = {c["id"]: c for c in CARDS}
+def load_manifest(templates_dir: Path) -> dict:
+    """Load templates/manifest.json. Returns dict with 'cards' and 'stages'."""
+    data = json.loads((templates_dir / "manifest.json").read_text(encoding="utf-8"))
+    validate_manifest(data)
+    return data
 
 
-def load_template_html(templates_dir: Path) -> dict[str, str]:
+def validate_manifest(manifest: dict) -> None:
+    """Fail fast on misconfiguration: missing stages, fixed stages with !=1 card."""
+    cards = manifest["cards"]
+    stages = manifest["stages"]
+    stage_nums = {s["num"] for s in stages}
+    for c in cards:
+        if c["stage"] not in stage_nums:
+            raise ValueError(f"card {c['id']} references unknown stage {c['stage']}")
+    for s in stages:
+        ids = [c["id"] for c in cards if c["stage"] == s["num"]]
+        if not ids:
+            raise ValueError(f"stage {s['num']} ({s['name']}) has no cards")
+        if s["policy"] == "fixed" and len(ids) != 1:
+            raise ValueError(
+                f"stage {s['num']} ({s['name']}) has policy=fixed but {len(ids)} cards: {ids}"
+            )
+
+
+def load_template_html(templates_dir: Path, cards: list[dict]) -> dict[str, str]:
     """Read each template HTML file once at startup."""
-    return {c["id"]: (templates_dir / c["file"]).read_text(encoding="utf-8") for c in CARDS}
+    return {c["id"]: (templates_dir / c["file"]).read_text(encoding="utf-8") for c in cards}
 
 
-def build_system_prompt(template_html_by_id: dict[str, str]) -> str:
+def build_narrative_flow(cards: list[dict], stages: list[dict]) -> str:
+    """Generate the 'X. name (Intent) → template ids [mark]' lines from manifest."""
+    lines = []
+    for s in stages:
+        ids = [c["id"] for c in cards if c["stage"] == s["num"]]
+        if s["policy"] == "fixed":
+            mark = "[fixed]"
+            if len(ids) == 1:
+                target = f"template {ids[0]}"
+            else:
+                target = f"template {' or '.join(ids)}"
+        else:
+            mark = "[pick 1]"
+            if len(ids) == 1:
+                target = f"template {ids[0]}"
+            elif len(ids) == 2:
+                target = f"template {ids[0]} or {ids[1]}"
+            else:
+                target = f"template {', '.join(ids[:-1])}, or {ids[-1]}"
+        lines.append(f"{s['num']}. {s['name']} ({s['intent']})  → {target}  {mark}")
+    return "\n".join(lines)
+
+
+def build_system_prompt(
+    template_html_by_id: dict[str, str],
+    cards: list[dict],
+    stages: list[dict],
+) -> str:
     """Mirror of buildSystemPrompt() in index.html."""
+    first_stage_num = stages[0]["num"]
+    last_stage_num = stages[-1]["num"]
+
     blocks = []
-    for c in CARDS:
+    for c in cards:
         fixed_note = ""
-        if c.get("fixed") == "first":
-            fixed_note = " [ALWAYS FIRST]"
-        elif c.get("fixed") == "last":
-            fixed_note = " [ALWAYS LAST]"
+        # Preserve legacy FIRST/LAST markers for cards sitting alone in the
+        # first/last stage (which must be policy=fixed by validation).
+        stage_policy = next(s["policy"] for s in stages if s["num"] == c["stage"])
+        if stage_policy == "fixed":
+            if c["stage"] == first_stage_num:
+                fixed_note = " [ALWAYS FIRST]"
+            elif c["stage"] == last_stage_num:
+                fixed_note = " [ALWAYS LAST]"
         block = (
             f"### {c['id']} — {c['name']} (cardClass=\"{c['cls']}\", label=\"{c['label']}\"){fixed_note}\n"
             f"```html\n{template_html_by_id[c['id']]}\n```"
@@ -48,7 +89,11 @@ def build_system_prompt(template_html_by_id: dict[str, str]) -> str:
         blocks.append(block)
     tpl_blocks = "\n\n".join(blocks)
 
-    return f"""You are a card news designer. Given a concept, you produce EXACTLY 8 cards in a fixed narrative order, selecting one template per narrative stage from the 15 below, and fill them with concept-specific content to form a coherent Instagram carousel.
+    total_cards = len(stages)
+    total_templates = len(cards)
+    narrative_flow = build_narrative_flow(cards, stages)
+
+    return f"""You are a card news designer. Given a concept, you produce EXACTLY {total_cards} cards in a fixed narrative order, selecting one template per narrative stage from the {total_templates} below, and fill them with concept-specific content to form a coherent Instagram carousel.
 
 # Output format
 Output STRICT raw JSON (no markdown fences, no commentary). Shape:
@@ -67,16 +112,9 @@ Output STRICT raw JSON (no markdown fences, no commentary). Shape:
 - Generate 1–2 Korean hashtags that best fit the specific concept and its content. Do not pick from a predefined list — infer the most accurate domain/topic tags from the concept itself. Prefer established, searchable tags that a Korean reader would actually use to find this content.
 - Each tag must start with "#" and contain no spaces.
 
-# Narrative flow (8 stages, 8 cards, strict order)
+# Narrative flow ({total_cards} stages, {total_cards} cards, strict order)
 Output exactly one card per stage, in this order:
-1. 개요 (Intro)       → template 01                 [fixed]
-2. 비유 (Grasp)       → template 02                 [fixed]
-3. 원리 (Mechanism)   → template 03, 04, 05, or 06  [pick 1]
-4. 대조 (Contrast)    → template 07, 08, or 09      [pick 1]
-5. 사례 (Validate)    → template 10 or 11           [pick 1]
-6. 질문 (Clarify)     → template 12 or 13           [pick 1]
-7. 적용 (Apply)       → template 14                 [fixed]
-8. 마무리 (Close)     → template 15                 [fixed]
+{narrative_flow}
 
 # Selection guidance (stages 3–7)
 - Stage 3 — choose ONE. All four answer "what is the internal logic / structure of this concept?" but in different shapes:
@@ -92,7 +130,6 @@ Output exactly one card per stage, in this order:
 - Stage 5:
   - 10 (타임라인): historical / chronological sequence — how the concept was discovered or evolved.
   - 11 (실사례): concrete everyday scenes that instantiate the concept.
-- Stage 6: use 12 to reframe a common misconception, 13 for multiple small questions.
 - Stage 7 (Apply): template 14 (체크리스트) is fixed. Interpret flexibly:
   - **행동형** — when the concept is actionable (a habit, method, decision), 4–6 concrete things the reader can try today.
   - **자가진단형** — when the concept is descriptive (a bias, a phenomenon, a personality pattern), 4–6 signs/symptoms the reader can check against themselves.
@@ -133,7 +170,7 @@ RESPONSE_SCHEMA = {
         },
         "cards": {
             "type": "array",
-            "description": "정확히 8장의 카드. 서사 8단계 순서대로: 01, 02, (03|04|05|06), (07|08|09), (10|11), (12|13), 14, 15.",
+            "description": "정확히 8장의 카드. 서사 8단계 순서대로: 01, 02, (03|04|05|06), (07|08|09), (10|11), 13, 14, 15.",
             "minItems": 8,
             "maxItems": 8,
             "items": {

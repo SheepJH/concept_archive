@@ -10,26 +10,28 @@
 - **AWS Lambda / GCF 2nd gen**: 이미지 크기 제한(250MB 언팩)이 빡셈. Playwright + Chromium + Noto CJK + Python 얹으면 넘김.
 - **Cloud Run**: 컨테이너 그대로 올리고, 요청 없을 땐 0개 인스턴스. Playwright 공식 이미지 쓸 수 있음. 스케일 0 → N 자동.
 
-**트레이드오프**: 콜드스타트 3~5초. 단축어는 어차피 백그라운드로 돌리니 체감 X.
+**트레이드오프**: 콜드스타트 3~5초. Telegram 봇이 `⏳ 생성 중...`으로 먼저 답하니 체감 X.
 
 ---
 
 ## 2. 왜 Fire-and-forget 패턴인가
 
-처음엔 동기로 만들었다 → iOS Shortcut이 60초에서 타임아웃으로 죽음.
+전체 파이프라인(Gemini → Playwright → GCS → Telegram 전송)은 **60~120초** 걸린다. Telegram webhook은 응답을 빨리 안 돌려주면 재시도를 해버린다 → 동기로 돌리면 같은 작업이 두세 번 트리거됨.
 
-### 시도한 것들
-1. **동기 응답 (처음 버전)**: 60초 타임아웃으로 실패
-2. **/render + /publish-urls 2단계 (프리뷰 포함)**: 유저(=나)가 프리뷰 안 봄. UX 오히려 번거로워짐
-3. **최종: fire-and-forget + iOS 알림**: 즉시 200 OK, 실제 결과는 IG에서 확인
+### 구현
+1. `/tg` 웹훅 수신 → 즉시 `200 OK` 반환
+2. `asyncio.create_task(...)`로 파이프라인을 백그라운드로 띄움
+3. 완료되면 `sendMediaGroup`로 Telegram 채팅에 결과 푸시
 
-### 구현 핵심
 ```python
-asyncio.create_task(_do_publish(req))
-return {"ok": True, "queued": True}
+asyncio.create_task(_do_telegram_publish(chat_id, concept))
+return {"ok": True}
 ```
 
-**함정**: Cloud Run이 응답 반환 후 CPU를 스로틀링해버리면 백그라운드 태스크가 멈춘다. 반드시 `--no-cpu-throttling` 플래그 켜야 함.
+**함정**: Cloud Run이 응답 반환 후 CPU를 스로틀링하면 백그라운드 태스크가 멈춘다. 반드시 `--no-cpu-throttling` 플래그 켜야 함.
+
+### 사용자 알림
+백그라운드 진행 중에는 `sendChatAction("upload_photo")`을 4초마다 갱신해서 채팅 상단에 "사진 업로드 중..." 인디케이터를 띄운다 — 사용자가 "응답 안 옴?"으로 오해하지 않도록.
 
 ---
 
@@ -92,14 +94,14 @@ Playwright는 Chromium을 프로세스로 띄운다.
 - OOM으로 둘 다 죽음
 
 ### max-instances=3
-개인 인스타 계정 + 개인 단축어 사용이라 동시 요청이 이론상 1~2개.
+개인 인스타 + 개인 봇이라 동시 요청이 이론상 1~2개.
 3이면 여유 있고, 비용 폭주 방어도 됨.
 
 ---
 
 ## 7. 왜 Secrets Manager인가 — .env 커밋 X
 
-- `gemini-key`, `ig-token`, `ig-user-id`, `api-secret` 전부 Secret Manager
+- `gemini-key`, `ig-token`, `ig-user-id`, `api-secret`, `tg-token` 전부 Secret Manager
 - Cloud Run `--set-secrets`로 배포 시 주입
 - 로컬 개발용 `.env`는 `.gitignore`로 막고, `.env.example`만 커밋
 
@@ -107,29 +109,21 @@ Playwright는 Chromium을 프로세스로 띄운다.
 
 ---
 
-## 8. 왜 Bearer 토큰 인증인가 — 간단한 공유 시크릿
+## 8. 왜 Telegram secret_token만으로 인증하는가
 
-- 개인 툴이라 OAuth / JWT는 오버킬
-- `Authorization: Bearer <API_SECRET>` 단일 값으로 충분
-- 노출되면 Secret Manager 값만 회전
+Telegram의 `setWebhook`은 임의 값을 `secret_token`으로 받아두면, 모든 webhook 요청에 `X-Telegram-Bot-Api-Secret-Token` 헤더로 같이 보내준다.
 
----
-
-## 9. `/healthz` 엔드포인트가 왜 404인가
-
-Cloud Run은 `/healthz`를 **예약 경로**로 내부에서 가로챈다 → Google Frontend 404 반환.
-FastAPI까지 도달 못 함.
-
-헬스체크는 그냥 `/` 호출해서 404 FastAPI 응답이 오는지로 확인.
-(경로 이름을 `/health` 등으로 바꿔도 되지만, 실제 쓸 일이 거의 없어서 방치.)
+- 개인 툴이라 OAuth / JWT 같은 풀스케일 인증은 오버킬
+- `API_SECRET` 시크릿 하나를 webhook secret_token으로 재사용 → 봇 외 누가 `/tg`를 때려도 401
+- 노출되면 Secret Manager 값 회전 + `setWebhook` 한 번 더 호출하면 끝
 
 ---
 
-## 10. 카드 15종 + 8장 고정의 이유
+## 9. 카드 14종 + 8장 고정의 이유
 
-### 왜 15개 템플릿?
-개요 / 비유 / 오해와진실 / 단계 / 타임라인 / 비교 / 장단점 / 스펙트럼 / 실생활사례 / 통계숫자 / 결정트리 / 체크리스트 / FAQ / 한줄요약 + 예비 1개.
-모든 "개념 설명"은 이 15개 조합으로 표현 가능하다고 판단. 더 늘리면 LLM이 선택을 헤맴.
+### 왜 14개 템플릿?
+개요 / 비유 / 단계 / 타임라인 / 비교 / 장단점 / 스펙트럼 / 실생활사례 / 통계숫자 / 결정트리 / 체크리스트 / FAQ / 한줄요약 + 예비 1개.
+모든 "개념 설명"은 이 14개 조합으로 표현 가능하다고 판단. 더 늘리면 LLM이 선택을 헤맴.
 
 ### 왜 정확히 8장?
 - IG 캐러셀 최대 10장
