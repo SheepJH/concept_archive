@@ -11,7 +11,7 @@ from google.genai import types
 from prompts import RESPONSE_SCHEMA
 
 
-DEFAULT_MODEL = os.getenv("GEMINI_MODEL", "gemini-3-flash-preview")
+MODEL = os.getenv("GEMINI_MODEL", "gemini-3-flash-preview")
 
 
 def _client() -> genai.Client:
@@ -19,7 +19,7 @@ def _client() -> genai.Client:
     return genai.Client(api_key=api_key)
 
 
-async def generate_cards(concept: str, system_prompt: str, model: str | None = None) -> dict[str, Any]:
+async def generate_cards(concept: str, system_prompt: str) -> dict[str, Any]:
     """Call Gemini with system prompt + concept, return parsed JSON dict.
 
     The dict matches RESPONSE_SCHEMA: { title, tags[], cards[{id, main}] }.
@@ -33,7 +33,7 @@ async def generate_cards(concept: str, system_prompt: str, model: str | None = N
     )
 
     resp = await client.aio.models.generate_content(
-        model=model or DEFAULT_MODEL,
+        model=MODEL,
         contents=concept,
         config=cfg,
     )
