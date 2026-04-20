@@ -92,31 +92,30 @@ flowchart LR
 
 ```mermaid
 sequenceDiagram
-    autonumber
     participant U as 👤 사용자
     participant T as 📨 Telegram
     participant B as ☁️ 백엔드<br/>(Cloud Run)
     participant I as 📸 Instagram
 
-    U->>T: "더닝-크루거 효과"
-    T->>B: POST /tg (webhook)
-    B-->>T: 200 OK (즉시)
-    T-->>U: "⏳ 생성 중..."
+    U->>T: ① "더닝-크루거 효과"
+    T->>B: ② POST /tg (webhook)
+    B-->>T: ③ 200 OK (즉시)
+    T-->>U: ④ "⏳ 생성 중..."
 
     Note over B: 🧠 Gemini → 카드 8장 JSON
     Note over B: 🖼 Playwright → 1080×1350 PNG × 8
     Note over B: 📦 GCS 업로드 → public URLs
 
-    B->>T: sendMediaGroup (앨범)
-    T-->>U: 앨범 + [🔁 다시 만들기 · 📤 인스타 아카이브]
+    B->>T: ⑤ sendMediaGroup (앨범)
+    T-->>U: ⑥ 앨범 + [🔁 다시 만들기 · 📤 인스타 아카이브]
 
     Note over U,I: ── IG엔 아직 아무것도 안 올라감 ──
 
-    U->>T: 📤 아카이브 버튼
-    T->>B: callback_query
-    B->>I: 3단계 캐러셀 발행
-    I-->>B: media_id
-    B-->>U: "✅ 완료"
+    U->>T: ⑦ 📤 아카이브 버튼
+    T->>B: ⑧ callback_query
+    B->>I: ⑨ 3단계 캐러셀 발행
+    I-->>B: ⑩ media_id
+    B-->>U: ⑪ "✅ 완료"
 ```
 
 ---
