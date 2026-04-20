@@ -618,7 +618,9 @@ ${narrativeFlow}
 - Template 04 (2×2 매트릭스): first define the two axes (y-axis label, x-axis label), then fill 4 quadrants each with a short .q-title (type name) and a one-line .q-desc. Mark exactly one quadrant as class="quadrant qN highlight" for the most salient type.
 - Template 05 (공식): express the concept as a short equation (.lhs / .op / .rhs, or .frac > .top/.bar/.bot for ratios). Give a 1–2 sentence .explain and 2–4 .legend rows interpreting each symbol. Use this when the concept can be reduced to a structural identity.
 - Template 06 (인과사슬): 3–4 links. The last link must carry class="link outcome" as the resulting state. Each .arrow must explicitly signal causation (e.g. "↓ 때문에", "↓ 그래서", "↓ 결국"), not mere ordering.
-- Template 07 (comparison): 3–5 rows of criteria.
+- Template 07 (comparison): 3–5 rows of criteria. col-b is the "target" side (accent-highlighted); col-a is the contrast. For the \`.caption-note\` at the bottom (starts with "※ "):
+  - If col-a refers to a **생소하거나 전문적인 용어** (jargon, technical term, proper noun, or concept the general Korean reader might not know), write a one-line definition: \`※ {col-a 이름}: {20자 내외 간단 정의}\`.
+  - If col-a is a **common everyday term** already familiar to readers (e.g. 초보자, 아침, 사과), skip the definition and fall back to a one-line thematic insight contrasting the two sides.
 - Template 08 (빛과 그림자): 3 items on each side. Default label is 밝은 면 / 어두운 면 (duality of the concept itself). Use literal 얻는 것/잃는 것 only when the concept is explicitly actionable.
 - Template 09 (spectrum): choose marker left position as CSS inline style (e.g. style="left: 28%;").
 - Template 10 (timeline): 3–4 events, mark exactly one with class="event accent".
