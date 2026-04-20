@@ -48,6 +48,105 @@
 
 ---
 
+## 🔄 파이프라인
+
+### 큰 그림
+
+```mermaid
+flowchart LR
+    U(["👤 사용자"])
+    T["📨 Telegram Bot"]
+    R["☁️ Cloud Run · FastAPI<br/><code>POST /tg</code>"]
+    G["🧠 Gemini 3 Flash"]
+    P["🖼 Playwright<br/>HTML → PNG"]
+    S["📦 Cloud Storage"]
+    I["📸 Instagram<br/>Graph API"]
+
+    U -- "개념 메시지" --> T
+    T -- "webhook" --> R
+    R -. "즉시 200 OK" .-> T
+
+    subgraph BG ["⚙️ 백그라운드 파이프라인 (fire-and-forget · 60~90s)"]
+        direction LR
+        G --> P --> S
+    end
+
+    R --> G
+    S -- "public .png URLs" --> R
+    R -- "sendMediaGroup (8장 앨범)" --> T
+    T -- "프리뷰 + 버튼" --> U
+
+    U -- "📤 아카이브 버튼" --> T
+    T -- "callback_query" --> R
+    R -- "캐러셀 발행" --> I
+
+    classDef user fill:#fff,stroke:#888,color:#222
+    classDef tg fill:#E8F4FB,stroke:#26A5E4,color:#0B3C5D
+    classDef gcp fill:#F5F5F5,stroke:#999,color:#222
+    classDef llm fill:#FFF4E0,stroke:#E8A63B,color:#6B4A10
+    classDef ext fill:#FFE6EE,stroke:#D94C7A,color:#6B1733
+
+    class U user
+    class T tg
+    class R,P,S gcp
+    class G llm
+    class I ext
+```
+
+### 시간 순서
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor U as 👤 사용자
+    participant T as 📨 Telegram
+    participant R as ☁️ Cloud Run
+    participant G as 🧠 Gemini
+    participant P as 🖼 Playwright
+    participant S as 📦 GCS
+    participant I as 📸 Instagram
+
+    U->>T: "더닝-크루거 효과"
+    T->>R: POST /tg (webhook)
+    R-->>T: 200 OK (즉시 반환)
+    T->>U: "⏳ 생성 중..."
+
+    rect rgb(240, 247, 255)
+    Note over R,S: 백그라운드 작업 · 단계별 실패 알림
+    R->>G: 개념 → 카드 8장 JSON
+    G-->>R: title / tags / cards
+    R->>P: HTML+CSS 주입 → 1080×1350 렌더
+    P-->>R: PNG × 8 (2배 슈퍼샘플링)
+    R->>S: 업로드 (public, 7일 TTL)
+    S-->>R: .png URLs
+    end
+
+    R->>T: sendMediaGroup (앨범)
+    T->>U: 앨범 + [🔁 다시 만들기 · 📤 인스타 아카이브]
+
+    Note over U,I: ——— 여기까지는 IG에 아무것도 안 올라감 ———
+
+    U->>T: 📤 버튼 클릭
+    T->>R: callback_query
+    R->>I: 3단계 캐러셀 발행
+    I-->>R: media_id
+    R->>T: "✅ 아카이브 완료"
+    T->>U: 완료 알림
+```
+
+### 핵심 설계
+
+| 결정 | 이유 |
+|---|---|
+| **프리뷰 먼저, 발행은 선택** | 카드가 먼저 텔레그램에 답장으로 오고 `📤` 버튼을 눌러야만 IG에 발행됨. 실패작 자동 발행 방지. |
+| **Fire-and-forget** | `/tg`는 `asyncio.create_task`로 파이프라인을 띄우고 즉시 200을 반환 → 텔레그램 웹훅 타임아웃 회피. Cloud Run에 `--no-cpu-throttling` 필수. |
+| **단계별 에러 태그** | `Gemini 생성` / `카드 렌더링` / `GCS 업로드` / `텔레그램 전송` 4단계 각각 try 블록 → 실패 시 어느 단계가 죽었는지 바로 챗으로 통지. |
+| **Chromium 실제 렌더** | 브라우저에서 보던 HTML 템플릿 = IG에 올라가는 결과. 2x 슈퍼샘플링으로 텍스트 선명도 확보. |
+| **GCS 경유 발행** | IG Graph API는 `.png`/`.jpg`로 끝나고 리다이렉트 없는 공개 URL만 받음 (picsum 류는 `9004` 에러). GCS로 `.png` 확장자 고정 + public read. |
+| **`_LAST_JOBS` 인메모리 캐시** | `redo`/`archive` 버튼이 재호출할 수 있도록 chat_id → 마지막 결과 캐싱. 콜드 스타트 시 날아가지만 그땐 사용자가 다시 보내면 됨. |
+
+---
+
 ## 🧱 기술 스택
 
 | 레이어 | 사용 기술 |
