@@ -39,57 +39,47 @@
 
 ## 🔄 파이프라인
 
-<p align="center">
-  <img src="https://cdn.simpleicons.org/telegram/26A5E4" width="52" alt="Telegram" />
-  &nbsp;→&nbsp;
-  <img src="https://cdn.simpleicons.org/googlecloud/4285F4" width="52" alt="Cloud Run" />
-  &nbsp;+&nbsp;
-  <img src="https://cdn.simpleicons.org/fastapi/009688" width="52" alt="FastAPI" />
-  &nbsp;→&nbsp;
-  <img src="https://cdn.simpleicons.org/googlegemini/8E75B2" width="52" alt="Gemini" />
-  &nbsp;→&nbsp;
-  <img src="https://cdn.simpleicons.org/playwright/2EAD33" width="52" alt="Playwright" />
-  &nbsp;→&nbsp;
-  <img src="https://cdn.simpleicons.org/googlecloud/4285F4" width="52" alt="Cloud Storage" />
-  &nbsp;→&nbsp;
-  <img src="https://cdn.simpleicons.org/instagram/E4405F" width="52" alt="Instagram" />
-</p>
-<p align="center">
-  <sub><b>Telegram Bot</b> → <b>Cloud Run + FastAPI</b> → <b>Gemini 3 Flash</b> → <b>Playwright</b> → <b>Cloud Storage</b> → <b>Instagram Graph API</b></sub>
-</p>
-
 ```mermaid
-flowchart LR
-    A["📨<br/>Telegram Bot"]:::client
-    B["☁️<br/>Cloud Run<br/>FastAPI"]:::infra
-    C["🧠<br/>Gemini 3 Flash"]:::gen
-    D["🖼<br/>Playwright<br/>Chromium"]:::infra
-    E["📦<br/>Cloud Storage"]:::infra
-    F["📸<br/>Instagram<br/>Graph API"]:::ext
+sequenceDiagram
+    autonumber
+    actor U as 👤 사용자
+    participant T as 📨 Telegram Bot
+    participant R as ☁️ Cloud Run<br/>(FastAPI)
+    participant G as 🧠 Gemini 3 Flash
+    participant P as 🖼 Playwright
+    participant S as 📦 GCS
+    participant I as 📸 Instagram
 
-    A -->|"① 개념 메시지<br/>POST /tg (webhook)"| B
-    B -->|"② 8장 생성"| C
-    C -->|"③ HTML→PNG"| D
-    D -->|"④ 업로드"| E
-    E -.->|"⑤ 앨범 답장"| A
-    A -->|"⑥ 📤 인스타 아카이브<br/>버튼 클릭"| B
-    B -->|"⑦ 캐러셀 발행"| F
+    U->>T: "양자역학" 메시지
+    T->>R: POST /tg (webhook)
+    R-->>T: 200 OK (즉시)
 
-    classDef client fill:#26A5E4,stroke:#1D8BC0,color:#fff,stroke-width:2px
-    classDef gen fill:#FFF4E0,stroke:#E8A63B,color:#6B4A10,stroke-width:1.5px
-    classDef infra fill:#F5F5F5,stroke:#BBB,color:#222,stroke-width:1.5px
-    classDef ext fill:#FFE6EE,stroke:#D94C7A,color:#6B1733,stroke-width:1.5px
+    rect rgb(240, 247, 255)
+    Note over R,S: 백그라운드 파이프라인 · 60~90초
+    R->>G: 개념 → 카드 8장 생성
+    G-->>R: title / tags / cards (JSON)
+    R->>P: HTML + CSS 렌더
+    P-->>R: 1080×1350 PNG × 8
+    R->>S: 업로드
+    S-->>R: public .png URLs
+    end
 
-    linkStyle 0,1,2,3,5,6 stroke:#26A5E4,stroke-width:2px
-    linkStyle 4 stroke:#999,stroke-dasharray:5 5
+    R->>T: sendMediaGroup (앨범 8장)
+    T->>U: 📥 앨범 답장 + [🔁 다시 만들기 | 📤 인스타 아카이브]
+
+    Note over U,I: ——— 여기까지는 IG에 아무것도 안 올라감 ———
+
+    U->>T: 📤 버튼 클릭
+    T->>R: callback_query
+    R->>I: 캐러셀 3단계 발행
+    I-->>R: media_id
+    R->>T: ✅ 완료 메시지
 ```
 
-> **① → ④** 텔레그램에서 개념 메시지 수신 → 백그라운드에서 `Gemini 생성 → Playwright 렌더 → GCS 업로드`<br>
-> **⑤** 약 **60~90초 뒤** 봇이 카드뉴스 8장을 앨범으로 답장 (이 단계까지는 IG에 아무것도 안 올라감)<br>
-> **⑥ → ⑦** 사용자가 `📤 인스타 아카이브` 버튼을 누르면 그때 IG에 캐러셀 발행<br>
-> `🔁 다시 만들기` 버튼으로 같은 개념 재생성 가능 — **프리뷰 먼저, 발행은 선택**
-
-**색상 범례** · 🟦 진입점(Telegram) · ⬜ GCP 인프라(Cloud Run·Playwright·GCS) · 🟨 LLM(Gemini) · 🟥 외부 API(Instagram)
+**핵심 포인트**
+- **프리뷰 먼저, 발행은 선택** — 카드가 먼저 텔레그램에 답장으로 오고, `📤` 버튼을 눌러야만 IG에 올라감. 실패작이 자동 발행되는 일 없음.
+- **Fire-and-forget** — `/tg`는 즉시 200을 반환하고 파이프라인은 `asyncio.create_task`로 뒷단에서 실행. 텔레그램 웹훅 타임아웃 회피.
+- **Chromium 렌더링으로 픽셀 일치** — 브라우저로 보는 HTML 템플릿 결과 = IG에 올라가는 결과.
 
 ---
 
