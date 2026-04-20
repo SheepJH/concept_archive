@@ -3,14 +3,14 @@
 > 개념 하나를 던지면, 인스타그램에 카드뉴스 8장이 올라간다.
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Python_3.13-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python 3.13"/>
-  <img src="https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white" alt="FastAPI"/>
-  <img src="https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="Docker"/>
-  <img src="https://img.shields.io/badge/Cloud_Run-4285F4?style=for-the-badge&logo=googlecloud&logoColor=white" alt="Google Cloud Run"/>
-  <img src="https://img.shields.io/badge/Gemini_3_Flash-8E75B2?style=for-the-badge&logo=googlegemini&logoColor=white" alt="Gemini 3 Flash"/>
-  <img src="https://img.shields.io/badge/Playwright-2EAD33?style=for-the-badge&logo=playwright&logoColor=white" alt="Playwright"/>
-  <img src="https://img.shields.io/badge/Telegram_Bot-26A5E4?style=for-the-badge&logo=telegram&logoColor=white" alt="Telegram Bot"/>
-  <img src="https://img.shields.io/badge/Instagram_API-E4405F?style=for-the-badge&logo=instagram&logoColor=white" alt="Instagram Graph API"/>
+  <img src="https://img.shields.io/badge/Python_3.13-3776AB?style=flat-square&logo=python&logoColor=white" alt="Python 3.13"/>
+  <img src="https://img.shields.io/badge/FastAPI-009688?style=flat-square&logo=fastapi&logoColor=white" alt="FastAPI"/>
+  <img src="https://img.shields.io/badge/Docker-2496ED?style=flat-square&logo=docker&logoColor=white" alt="Docker"/>
+  <img src="https://img.shields.io/badge/Cloud_Run-4285F4?style=flat-square&logo=googlecloud&logoColor=white" alt="Google Cloud Run"/>
+  <img src="https://img.shields.io/badge/Gemini_3_Flash-8E75B2?style=flat-square&logo=googlegemini&logoColor=white" alt="Gemini 3 Flash"/>
+  <img src="https://img.shields.io/badge/Playwright-2EAD33?style=flat-square&logo=playwright&logoColor=white" alt="Playwright"/>
+  <img src="https://img.shields.io/badge/Telegram_Bot-26A5E4?style=flat-square&logo=telegram&logoColor=white" alt="Telegram Bot"/>
+  <img src="https://img.shields.io/badge/Instagram_API-E4405F?style=flat-square&logo=instagram&logoColor=white" alt="Instagram Graph API"/>
 </p>
 
 텔레그램 봇에 "양자역학"이라고 보내면, 약 90초 뒤 봇이 8장짜리 카드뉴스를
@@ -149,17 +149,35 @@ sequenceDiagram
 
 ## 🧱 기술 스택
 
-| 레이어 | 사용 기술 |
-|---|---|
-| **런타임** | Python 3.13 · Docker (`mcr.microsoft.com/playwright/python:v1.48.0-jammy`) |
-| **백엔드** | FastAPI 0.115 · Uvicorn 0.32 · Pydantic 2.9 · httpx 0.27 |
-| **LLM** | Google Gemini 3 Flash (`google-genai` SDK) · structured output |
-| **렌더링** | Playwright 1.48 (Chromium) · HTML5 · CSS3 |
-| **프론트 (프리뷰)** | Vanilla JS · Pretendard · Inter (CDN) |
-| **인프라** | Google Cloud Run · Cloud Storage · Secret Manager · Cloud Build |
-| **외부 API** | Telegram Bot API · Instagram Graph API v21.0 (Business 계정) |
-| **클라이언트** | Telegram (BotFather로 만든 개인 봇) |
-| **CI / 배포** | `gcloud run deploy --source .` (Cloud Build 자동) |
+파이프라인 단계별로 어떤 기술이 어디에 쓰이는지.
+
+### 🖥 클라이언트 — 개념 입력
+- **Telegram Bot API** — BotFather로 만든 개인 봇. 메시지 수신 + 앨범 전송 + 인라인 버튼
+- 별도 래퍼 없이 [`backend/telegram.py`](backend/telegram.py)에서 `httpx`로 직접 호출
+
+### ☁️ 백엔드 — 웹훅 처리 & 오케스트레이션
+- **FastAPI 0.115** + **Uvicorn 0.32** + **Pydantic 2.9** — `/tg` 웹훅, `asyncio.create_task` 기반 fire-and-forget
+- **Python 3.13** — 최신 타입 문법(`str | None`) 필요
+- 외부 호출은 전부 **`httpx`** 비동기 클라이언트
+
+### 🧠 생성 — 개념 → 카드 JSON
+- **Google Gemini 3 Flash** (`google-genai` SDK)
+- `response_schema`로 `{title, tags, cards[{id, main}]}` 스키마 강제 → 파서 불필요
+
+### 🎨 렌더링 — JSON → PNG 8장
+- **Playwright 1.48 (Chromium)** — 1080×1350, 2x 슈퍼샘플링
+- **HTML5 + CSS3** · 카드 15종은 [`templates/01~15.html`](templates/) 순수 HTML
+- **Pretendard** · **Inter** 웹폰트 (CDN)
+
+### 📦 저장 & 발행
+- **Google Cloud Storage** — public `.png`, 7일 TTL 자동 삭제 lifecycle
+- **Instagram Graph API v21.0** — 3단계 캐러셀 (child 컨테이너 → CAROUSEL → publish)
+
+### 🚀 인프라 & 배포
+- **Google Cloud Run** — `asia-northeast3`, 2Gi / 2CPU, `concurrency=1`, `--no-cpu-throttling` 필수
+- **Cloud Build** — `gcloud run deploy --source .` 한 방 배포
+- **Secret Manager** — 5개 시크릿(`gemini-key` · `ig-token` · `ig-user-id` · `api-secret` · `tg-token`)
+- **Docker** — 베이스 `mcr.microsoft.com/playwright/python:v1.48.0-jammy` (+ Noto CJK 폰트)
 
 ---
 
