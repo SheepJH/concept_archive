@@ -50,47 +50,30 @@
 
 ## 🔄 파이프라인
 
+두 단계로 나뉨 — **① 프리뷰 생성** (개념 보내면 자동 실행) → **② 인스타 발행** (사용자가 버튼 눌러야 실행).
+
 ### 큰 그림
 
 ```mermaid
-flowchart LR
-    U(["👤 사용자"])
-    T["📨 Telegram Bot"]
-    R["☁️ Cloud Run · FastAPI<br/><code>POST /tg</code>"]
-    G["🧠 Gemini 3 Flash"]
-    P["🖼 Playwright<br/>HTML → PNG"]
-    S["📦 Cloud Storage"]
-    I["📸 Instagram<br/>Graph API"]
-
-    U -- "개념 메시지" --> T
-    T -- "webhook" --> R
-    R -. "즉시 200 OK" .-> T
-
-    subgraph BG ["⚙️ 백그라운드 파이프라인 (fire-and-forget · 60~90s)"]
-        direction LR
-        G --> P --> S
+flowchart TD
+    subgraph Phase1 ["① 프리뷰 생성 · 60~90초"]
+        direction TB
+        U1([👤 사용자]) -- "개념 메시지" --> T1[📨 Telegram]
+        T1 -- "POST /tg" --> B1[☁️ Cloud Run · FastAPI]
+        B1 --> G[🧠 Gemini 3 Flash]
+        G --> P[🖼 Playwright<br/>HTML → PNG × 8]
+        P --> S[📦 Cloud Storage]
+        S -- "public URLs" --> B1
+        B1 -- "sendMediaGroup" --> T1
+        T1 -- "앨범 + [🔁 · 📤]" --> U1
     end
 
-    R --> G
-    S -- "public .png URLs" --> R
-    R -- "sendMediaGroup (8장 앨범)" --> T
-    T -- "프리뷰 + 버튼" --> U
-
-    U -- "📤 아카이브 버튼" --> T
-    T -- "callback_query" --> R
-    R -- "캐러셀 발행" --> I
-
-    classDef user fill:#fff,stroke:#888,color:#222
-    classDef tg fill:#E8F4FB,stroke:#26A5E4,color:#0B3C5D
-    classDef gcp fill:#F5F5F5,stroke:#999,color:#222
-    classDef llm fill:#FFF4E0,stroke:#E8A63B,color:#6B4A10
-    classDef ext fill:#FFE6EE,stroke:#D94C7A,color:#6B1733
-
-    class U user
-    class T tg
-    class R,P,S gcp
-    class G llm
-    class I ext
+    subgraph Phase2 ["② 인스타 발행 · 사용자가 📤 누를 때만"]
+        direction TB
+        U2([👤 사용자]) -- "📤 버튼" --> T2[📨 Telegram]
+        T2 -- "callback_query" --> B2[☁️ Cloud Run]
+        B2 -- "3단계 캐러셀" --> I[📸 Instagram Graph API]
+    end
 ```
 
 ### 시간 순서
@@ -98,40 +81,30 @@ flowchart LR
 ```mermaid
 sequenceDiagram
     autonumber
-    actor U as 👤 사용자
+    participant U as 👤 사용자
     participant T as 📨 Telegram
-    participant R as ☁️ Cloud Run
-    participant G as 🧠 Gemini
-    participant P as 🖼 Playwright
-    participant S as 📦 GCS
+    participant B as ☁️ 백엔드<br/>(Cloud Run)
     participant I as 📸 Instagram
 
     U->>T: "더닝-크루거 효과"
-    T->>R: POST /tg (webhook)
-    R-->>T: 200 OK (즉시 반환)
-    T->>U: "⏳ 생성 중..."
+    T->>B: POST /tg (webhook)
+    B-->>T: 200 OK (즉시)
+    T-->>U: "⏳ 생성 중..."
 
-    rect rgb(240, 247, 255)
-    Note over R,S: 백그라운드 작업 · 단계별 실패 알림
-    R->>G: 개념 → 카드 8장 JSON
-    G-->>R: title / tags / cards
-    R->>P: HTML+CSS 주입 → 1080×1350 렌더
-    P-->>R: PNG × 8 (2배 슈퍼샘플링)
-    R->>S: 업로드 (public, 7일 TTL)
-    S-->>R: .png URLs
-    end
+    Note over B: 🧠 Gemini → 카드 8장 JSON
+    Note over B: 🖼 Playwright → 1080×1350 PNG × 8
+    Note over B: 📦 GCS 업로드 → public URLs
 
-    R->>T: sendMediaGroup (앨범)
-    T->>U: 앨범 + [🔁 다시 만들기 · 📤 인스타 아카이브]
+    B->>T: sendMediaGroup (앨범)
+    T-->>U: 앨범 + [🔁 다시 만들기 · 📤 인스타 아카이브]
 
-    Note over U,I: ——— 여기까지는 IG에 아무것도 안 올라감 ———
+    Note over U,I: ── IG엔 아직 아무것도 안 올라감 ──
 
-    U->>T: 📤 버튼 클릭
-    T->>R: callback_query
-    R->>I: 3단계 캐러셀 발행
-    I-->>R: media_id
-    R->>T: "✅ 아카이브 완료"
-    T->>U: 완료 알림
+    U->>T: 📤 아카이브 버튼
+    T->>B: callback_query
+    B->>I: 3단계 캐러셀 발행
+    I-->>B: media_id
+    B-->>U: "✅ 완료"
 ```
 
 ### 핵심 설계
