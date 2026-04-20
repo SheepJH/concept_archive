@@ -1,9 +1,10 @@
 # concept-archive
 
-> 개념 하나를 던지면, 인스타그램에 카드뉴스 8장이 자동으로 올라간다.
+> 개념 하나를 던지면, 인스타그램에 카드뉴스 8장이 올라간다.
 
-iOS 단축어에 "양자역학"이라고 입력하면, 약 90초 뒤
-[@what_is_this.zip](https://instagram.com/what_is_this.zip) 피드에 8장짜리 캐러셀이 올라온다.
+텔레그램 봇에 "양자역학"이라고 보내면, 약 90초 뒤 봇이 8장짜리 카드뉴스를
+앨범으로 답장한다. 마음에 들면 **📤 인스타 아카이브** 버튼을 눌러
+[@what_is_this.zip](https://instagram.com/what_is_this.zip)에 캐러셀로 발행.
 
 ---
 
@@ -38,37 +39,57 @@ iOS 단축어에 "양자역학"이라고 입력하면, 약 90초 뒤
 
 ## 🔄 파이프라인
 
+<p align="center">
+  <img src="https://cdn.simpleicons.org/telegram/26A5E4" width="52" alt="Telegram" />
+  &nbsp;→&nbsp;
+  <img src="https://cdn.simpleicons.org/googlecloud/4285F4" width="52" alt="Cloud Run" />
+  &nbsp;+&nbsp;
+  <img src="https://cdn.simpleicons.org/fastapi/009688" width="52" alt="FastAPI" />
+  &nbsp;→&nbsp;
+  <img src="https://cdn.simpleicons.org/googlegemini/8E75B2" width="52" alt="Gemini" />
+  &nbsp;→&nbsp;
+  <img src="https://cdn.simpleicons.org/playwright/2EAD33" width="52" alt="Playwright" />
+  &nbsp;→&nbsp;
+  <img src="https://cdn.simpleicons.org/googlecloud/4285F4" width="52" alt="Cloud Storage" />
+  &nbsp;→&nbsp;
+  <img src="https://cdn.simpleicons.org/instagram/E4405F" width="52" alt="Instagram" />
+</p>
+<p align="center">
+  <sub><b>Telegram Bot</b> → <b>Cloud Run + FastAPI</b> → <b>Gemini 3 Flash</b> → <b>Playwright</b> → <b>Cloud Storage</b> → <b>Instagram Graph API</b></sub>
+</p>
+
 ```mermaid
 flowchart LR
-    A["📱<br/>iOS Shortcut"]:::client
+    A["📨<br/>Telegram Bot"]:::client
     B["☁️<br/>Cloud Run<br/>FastAPI"]:::infra
     C["🧠<br/>Gemini 3 Flash"]:::gen
     D["🖼<br/>Playwright<br/>Chromium"]:::infra
     E["📦<br/>Cloud Storage"]:::infra
     F["📸<br/>Instagram<br/>Graph API"]:::ext
 
-    A -->|"① POST /publish"| B
-    B -.->|"200 OK (즉시)"| A
+    A -->|"① 개념 메시지<br/>POST /tg (webhook)"| B
     B -->|"② 8장 생성"| C
     C -->|"③ HTML→PNG"| D
     D -->|"④ 업로드"| E
-    E -->|"⑤ 캐러셀 발행"| F
-    F -.->|"media_id"| A
+    E -.->|"⑤ 앨범 답장"| A
+    A -->|"⑥ 📤 인스타 아카이브<br/>버튼 클릭"| B
+    B -->|"⑦ 캐러셀 발행"| F
 
-    classDef client fill:#0066FF,stroke:#0044cc,color:#fff,stroke-width:2px
+    classDef client fill:#26A5E4,stroke:#1D8BC0,color:#fff,stroke-width:2px
     classDef gen fill:#FFF4E0,stroke:#E8A63B,color:#6B4A10,stroke-width:1.5px
     classDef infra fill:#F5F5F5,stroke:#BBB,color:#222,stroke-width:1.5px
     classDef ext fill:#FFE6EE,stroke:#D94C7A,color:#6B1733,stroke-width:1.5px
 
-    linkStyle 0,2,3,4,5 stroke:#0066FF,stroke-width:2px
-    linkStyle 1,6 stroke:#999,stroke-dasharray:5 5
+    linkStyle 0,1,2,3,5,6 stroke:#26A5E4,stroke-width:2px
+    linkStyle 4 stroke:#999,stroke-dasharray:5 5
 ```
 
-> **①** 폰에서 POST → **즉시 200 OK 반환** (fire-and-forget)<br>
-> **② → ⑤** 백그라운드에서 `Gemini 생성 → Playwright 렌더 → GCS 업로드 → IG 발행`<br>
-> 약 **90초 뒤** `media_id`와 함께 IG 피드에 캐러셀 등장 → iOS가 알림 표시
+> **① → ④** 텔레그램에서 개념 메시지 수신 → 백그라운드에서 `Gemini 생성 → Playwright 렌더 → GCS 업로드`<br>
+> **⑤** 약 **60~90초 뒤** 봇이 카드뉴스 8장을 앨범으로 답장 (이 단계까지는 IG에 아무것도 안 올라감)<br>
+> **⑥ → ⑦** 사용자가 `📤 인스타 아카이브` 버튼을 누르면 그때 IG에 캐러셀 발행<br>
+> `🔁 다시 만들기` 버튼으로 같은 개념 재생성 가능 — **프리뷰 먼저, 발행은 선택**
 
-**색상 범례** · 🟦 진입점(iOS) · ⬜ GCP 인프라(Cloud Run·Playwright·GCS) · 🟨 LLM(Gemini) · 🟥 외부 API(Instagram)
+**색상 범례** · 🟦 진입점(Telegram) · ⬜ GCP 인프라(Cloud Run·Playwright·GCS) · 🟨 LLM(Gemini) · 🟥 외부 API(Instagram)
 
 ---
 
@@ -82,8 +103,8 @@ flowchart LR
 | **렌더링** | Playwright 1.48 (Chromium) · HTML5 · CSS3 |
 | **프론트 (프리뷰)** | Vanilla JS · Pretendard · Inter (CDN) |
 | **인프라** | Google Cloud Run · Cloud Storage · Secret Manager · Cloud Build |
-| **외부 API** | Instagram Graph API v21.0 (Business 계정) |
-| **클라이언트** | iOS Shortcuts |
+| **외부 API** | Telegram Bot API · Instagram Graph API v21.0 (Business 계정) |
+| **클라이언트** | Telegram (BotFather로 만든 개인 봇) |
 | **CI / 배포** | `gcloud run deploy --source .` (Cloud Build 자동) |
 
 ---
@@ -96,7 +117,8 @@ concept-archive/
 ├── shared/styles.css       # 디자인 토큰 + 공통 레이아웃
 ├── templates/              # 카드 15종 HTML (01-overview ~ 15-oneline)
 ├── backend/
-│   ├── main.py             # FastAPI + fire-and-forget 디스패처
+│   ├── main.py             # FastAPI + fire-and-forget 디스패처 + /tg 웹훅
+│   ├── telegram.py         # Telegram Bot API 얇은 래퍼 (httpx 기반)
 │   ├── prompts.py          # 카드 메타 + 시스템 프롬프트 + 응답 스키마
 │   ├── gemini_client.py    # Gemini API 래퍼
 │   ├── renderer.py         # Playwright HTML→PNG
@@ -128,7 +150,7 @@ uvicorn main:app --reload --port 8080
 
 ### 배포 (Cloud Run)
 
-Secret Manager에 `gemini-key`, `ig-token`, `ig-user-id`, `api-secret` 4개를 넣고:
+Secret Manager에 `gemini-key`, `ig-token`, `ig-user-id`, `api-secret`, `tg-token` 5개를 넣고:
 
 ```bash
 gcloud run deploy card-news \
@@ -136,12 +158,19 @@ gcloud run deploy card-news \
   --memory 2Gi --cpu 2 \
   --max-instances 3 --concurrency 1 \
   --no-cpu-throttling \
-  --set-secrets GEMINI_KEY=gemini-key:latest,IG_TOKEN=ig-token:latest,IG_USER_ID=ig-user-id:latest,API_SECRET=api-secret:latest \
+  --set-secrets GEMINI_KEY=gemini-key:latest,IG_TOKEN=ig-token:latest,IG_USER_ID=ig-user-id:latest,API_SECRET=api-secret:latest,TG_TOKEN=tg-token:latest \
   --set-env-vars GCS_BUCKET=your-bucket-name \
   --allow-unauthenticated
 ```
 
-### iOS 단축어
+### 텔레그램 봇 연결
 
-1. **URL 콘텐츠 가져오기**: POST `https://<CLOUD_RUN_URL>/publish`, 헤더 `Authorization: Bearer <API_SECRET>`, 본문 `{"concept": "매번 묻기"}`
-2. **알림 보기** — 응답 변수 표시
+1. [@BotFather](https://t.me/BotFather)에서 `/newbot` → 봇 이름·username 정하고 **봇 토큰** 받기 → Secret Manager의 `tg-token`에 저장
+2. Cloud Run 배포 완료 후, 봇 웹훅을 `/tg` 엔드포인트로 등록:
+   ```bash
+   curl -X POST "https://api.telegram.org/bot<TG_TOKEN>/setWebhook" \
+     -d "url=https://<CLOUD_RUN_URL>/tg" \
+     -d "secret_token=<API_SECRET>"
+   ```
+   (`secret_token`은 `API_SECRET`과 동일한 값을 사용 — 봇이 보내는 `X-Telegram-Bot-Api-Secret-Token` 헤더로 검증)
+3. 봇과 대화 시작 → 개념 메시지 보내기 → 1~2분 후 카드뉴스 앨범 도착 → `📤 인스타 아카이브` 버튼으로 발행
