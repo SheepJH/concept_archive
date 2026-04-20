@@ -2,6 +2,17 @@
 
 > 개념 하나를 던지면, 인스타그램에 카드뉴스 8장이 올라간다.
 
+<p align="center">
+  <img src="https://img.shields.io/badge/Python_3.13-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python 3.13"/>
+  <img src="https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white" alt="FastAPI"/>
+  <img src="https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="Docker"/>
+  <img src="https://img.shields.io/badge/Cloud_Run-4285F4?style=for-the-badge&logo=googlecloud&logoColor=white" alt="Google Cloud Run"/>
+  <img src="https://img.shields.io/badge/Gemini_3_Flash-8E75B2?style=for-the-badge&logo=googlegemini&logoColor=white" alt="Gemini 3 Flash"/>
+  <img src="https://img.shields.io/badge/Playwright-2EAD33?style=for-the-badge&logo=playwright&logoColor=white" alt="Playwright"/>
+  <img src="https://img.shields.io/badge/Telegram_Bot-26A5E4?style=for-the-badge&logo=telegram&logoColor=white" alt="Telegram Bot"/>
+  <img src="https://img.shields.io/badge/Instagram_API-E4405F?style=for-the-badge&logo=instagram&logoColor=white" alt="Instagram Graph API"/>
+</p>
+
 텔레그램 봇에 "양자역학"이라고 보내면, 약 90초 뒤 봇이 8장짜리 카드뉴스를
 앨범으로 답장한다. 마음에 들면 **📤 인스타 아카이브** 버튼을 눌러
 [@what_is_this.zip](https://instagram.com/what_is_this.zip)에 캐러셀로 발행.
