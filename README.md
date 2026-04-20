@@ -55,25 +55,42 @@
 ### 큰 그림
 
 ```mermaid
-flowchart TD
-    subgraph Phase1 ["① 프리뷰 생성 · 60~90초"]
-        direction TB
-        U1([👤 사용자]) -- "개념 메시지" --> T1[📨 Telegram]
-        T1 -- "POST /tg" --> B1[☁️ Cloud Run · FastAPI]
-        B1 --> G[🧠 Gemini 3 Flash]
-        G --> P[🖼 Playwright<br/>HTML → PNG × 8]
-        P --> S[📦 Cloud Storage]
-        S -- "public URLs" --> B1
-        B1 -- "sendMediaGroup" --> T1
-        T1 -- "앨범 + [🔁 · 📤]" --> U1
+flowchart LR
+    subgraph Phase1 ["① 프리뷰 생성 · 60~90초 · 자동"]
+        direction LR
+        U1([👤]) --> T1[📨 Telegram]
+        T1 --> B1[☁️ Cloud Run]
+        B1 --> G[🧠 Gemini]
+        G --> P[🖼 Playwright]
+        P --> S[📦 GCS]
+        S --> T2[📨 Telegram]
+        T2 --> U2([👤])
     end
 
-    subgraph Phase2 ["② 인스타 발행 · 사용자가 📤 누를 때만"]
-        direction TB
-        U2([👤 사용자]) -- "📤 버튼" --> T2[📨 Telegram]
-        T2 -- "callback_query" --> B2[☁️ Cloud Run]
-        B2 -- "3단계 캐러셀" --> I[📸 Instagram Graph API]
+    subgraph Phase2 ["② 인스타 발행 · 📤 누를 때만"]
+        direction LR
+        U3([👤]) --> T3[📨 Telegram]
+        T3 --> B2[☁️ Cloud Run]
+        B2 --> I[📸 Instagram]
     end
+
+    Phase1 ~~~ Phase2
+
+    classDef user fill:#2a2a2a,stroke:#888,color:#fff,stroke-width:1px
+    classDef tg fill:#26A5E4,stroke:#26A5E4,color:#fff,stroke-width:0px
+    classDef gcp fill:#4285F4,stroke:#4285F4,color:#fff,stroke-width:0px
+    classDef gemini fill:#8E75B2,stroke:#8E75B2,color:#fff,stroke-width:0px
+    classDef render fill:#2EAD33,stroke:#2EAD33,color:#fff,stroke-width:0px
+    classDef gcs fill:#F9AB00,stroke:#F9AB00,color:#111,stroke-width:0px
+    classDef ig fill:#E4405F,stroke:#E4405F,color:#fff,stroke-width:0px
+
+    class U1,U2,U3 user
+    class T1,T2,T3 tg
+    class B1,B2 gcp
+    class G gemini
+    class P render
+    class S gcs
+    class I ig
 ```
 
 ### 시간 순서
