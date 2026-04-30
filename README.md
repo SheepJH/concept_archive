@@ -170,6 +170,6 @@ concept-archive/
 │   ├── renderer.py           # Playwright HTML→PNG
 │   ├── storage.py            # GCS 업로드
 │   └── instagram.py          # IG Graph API 캐러셀 발행
-├── docs/                     # architecture · decisions · design
+├── docs/                     # decisions · design
 └── Dockerfile
 ```

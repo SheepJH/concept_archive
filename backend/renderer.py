@@ -1,10 +1,8 @@
 """Render generated card HTML to 1080×1350 PNG via Playwright."""
 from __future__ import annotations
 
-import asyncio
 import re
 from pathlib import Path
-from typing import Iterable
 
 from playwright.async_api import async_playwright
 

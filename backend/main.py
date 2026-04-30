@@ -8,6 +8,7 @@ from __future__ import annotations
 import asyncio
 import logging
 import os
+from contextlib import asynccontextmanager
 from pathlib import Path
 
 from fastapi import FastAPI, Header, HTTPException, Request
@@ -31,9 +32,6 @@ ROOT = Path(__file__).resolve().parent.parent
 TEMPLATES_DIR = ROOT / "templates"
 SHARED_DIR = ROOT / "shared"
 
-app = FastAPI(title="card-news", version="0.1.0")
-
-
 # Loaded once at startup ------------------------------------------------------
 _CARDS: list[dict] = []
 _STAGES: list[dict] = []
@@ -44,8 +42,8 @@ _SHARED_CSS: str = ""
 _SYSTEM_PROMPT: str = ""
 
 
-@app.on_event("startup")
-def _startup() -> None:
+@asynccontextmanager
+async def lifespan(app: FastAPI):
     global _CARDS, _STAGES, _CARD_BY_ID, _TEMPLATES_HTML, _TEMPLATE_CSS, _SHARED_CSS, _SYSTEM_PROMPT
     manifest = load_manifest(TEMPLATES_DIR)
     _CARDS = manifest["cards"]
@@ -56,6 +54,10 @@ def _startup() -> None:
     _SHARED_CSS = load_shared_css(SHARED_DIR)
     _SYSTEM_PROMPT = build_system_prompt(_TEMPLATES_HTML, _CARDS, _STAGES)
     log.info("Loaded %d templates", len(_TEMPLATES_HTML))
+    yield
+
+
+app = FastAPI(title="card-news", version="0.1.0", lifespan=lifespan)
 
 
 # Telegram bot ----------------------------------------------------------------

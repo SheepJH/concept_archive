@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import asyncio
 import os
-from typing import Iterable
+import time
 
 import httpx
 
@@ -41,7 +41,7 @@ async def _create_image_container(client: httpx.AsyncClient, ig_user_id: str, to
 
 
 async def _wait_until_ready(client: httpx.AsyncClient, container_id: str, token: str, timeout_s: int = 120) -> None:
-    deadline = asyncio.get_event_loop().time() + timeout_s
+    deadline = time.monotonic() + timeout_s
     delay = 1.5
     while True:
         r = await client.get(
@@ -55,7 +55,7 @@ async def _wait_until_ready(client: httpx.AsyncClient, container_id: str, token:
             return
         if status in ("ERROR", "EXPIRED"):
             raise RuntimeError(f"Container {container_id} failed: {body}")
-        if asyncio.get_event_loop().time() > deadline:
+        if time.monotonic() > deadline:
             raise TimeoutError(f"Container {container_id} not ready after {timeout_s}s: {body}")
         await asyncio.sleep(delay)
         delay = min(delay * 1.4, 5.0)
