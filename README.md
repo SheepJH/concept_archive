@@ -2,17 +2,6 @@
 
 > **모르는 개념을 던지면, 이해하기 쉬운 카드뉴스 8장으로 돌려받고 — 인스타그램에 아카이브한다.**
 
-<p align="left">
-  <img src="https://img.shields.io/badge/Python_3.13-3776AB?style=flat-square&logo=python&logoColor=white" alt="Python 3.13"/>
-  <img src="https://img.shields.io/badge/FastAPI-009688?style=flat-square&logo=fastapi&logoColor=white" alt="FastAPI"/>
-  <img src="https://img.shields.io/badge/Docker-2496ED?style=flat-square&logo=docker&logoColor=white" alt="Docker"/>
-  <img src="https://img.shields.io/badge/Google_Cloud_Run-4285F4?style=flat-square&logo=googlecloud&logoColor=white" alt="Google Cloud Run"/>
-  <img src="https://img.shields.io/badge/Gemini_3_Flash-8E75B2?style=flat-square&logo=googlegemini&logoColor=white" alt="Gemini 3 Flash"/>
-  <img src="https://img.shields.io/badge/Playwright-2EAD33?style=flat-square&logo=playwright&logoColor=white" alt="Playwright"/>
-  <img src="https://img.shields.io/badge/Telegram_Bot-26A5E4?style=flat-square&logo=telegram&logoColor=white" alt="Telegram Bot"/>
-  <img src="https://img.shields.io/badge/Instagram_Graph_API-E4405F?style=flat-square&logo=instagram&logoColor=white" alt="Instagram Graph API"/>
-</p>
-
 모르는 개념이 생길 때마다 텔레그램 봇에 *"더닝-크루거 효과"* 처럼 한 줄을 보내면, 약 60초 뒤 봇이 **나만의 과외 노트 같은 카드뉴스 8장**을 앨범으로 답장합니다. 이해가 됐다 싶으면 `📤 인스타 아카이브` 버튼을 눌러 [@what_is_this.zip](https://instagram.com/what_is_this.zip)에 남겨둡니다 — 나중에 다시 꺼내 볼 수 있게.
 
 ---
