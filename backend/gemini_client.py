@@ -1,17 +1,21 @@
 """Gemini API client with structured output."""
 from __future__ import annotations
 
+import asyncio
 import json
 import os
 from typing import Any
 
 from google import genai
+from google.genai import errors as genai_errors
 from google.genai import types
 
 from prompts import RESPONSE_SCHEMA
 
 
 MODEL = os.getenv("GEMINI_MODEL", "gemini-3-flash-preview")
+MAX_RETRIES = 4
+RETRY_BACKOFF_SEC = (2, 5, 10, 20)
 
 
 def _client() -> genai.Client:
@@ -23,6 +27,7 @@ async def generate_cards(concept: str, system_prompt: str) -> dict[str, Any]:
     """Call Gemini with system prompt + concept, return parsed JSON dict.
 
     The dict matches RESPONSE_SCHEMA: { title, tags[], cards[{id, main}] }.
+    Retries on 503/UNAVAILABLE (free-tier capacity spikes).
     """
     client = _client()
     cfg = types.GenerateContentConfig(
@@ -32,11 +37,25 @@ async def generate_cards(concept: str, system_prompt: str) -> dict[str, Any]:
         temperature=0.7,
     )
 
-    resp = await client.aio.models.generate_content(
-        model=MODEL,
-        contents=concept,
-        config=cfg,
-    )
+    resp = None
+    last_err: Exception | None = None
+    for attempt in range(MAX_RETRIES):
+        try:
+            resp = await client.aio.models.generate_content(
+                model=MODEL,
+                contents=concept,
+                config=cfg,
+            )
+            break
+        except genai_errors.ServerError as e:
+            last_err = e
+            status = getattr(e, "code", None)
+            if status in (503, 429) and attempt < MAX_RETRIES - 1:
+                await asyncio.sleep(RETRY_BACKOFF_SEC[attempt])
+                continue
+            raise
+    if resp is None:
+        raise RuntimeError(f"Gemini retries exhausted: {last_err}")
 
     text = resp.text or ""
     if not text.strip():
